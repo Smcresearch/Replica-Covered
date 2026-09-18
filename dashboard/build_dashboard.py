@@ -32,12 +32,26 @@ WRAPPER = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Backtest dashboard for the NIFTY equity replicas and the conditioned covered call overlay.">
+{head}
 </head>
 <body style="margin:0">
 {body}
 </body>
 </html>
 """
+
+
+def standalone(page):
+    """Wrap the artifact body as a valid standalone document.
+
+    The artifact publisher supplies its own <head>, so the template leads with
+    <title>/<link>/<style> and no document scaffolding. A local file needs those
+    in a real <head> -- browsers hoist them from <body>, but only by error
+    recovery, and GitHub Pages serves the file as-is.
+    """
+    cut = page.index("</style>") + len("</style>")
+    return WRAPPER.format(head=page[:cut].strip(), body=page[cut:].strip())
 
 
 def collect():
@@ -99,18 +113,24 @@ def main():
 
     with open(os.path.join(HERE, "dash_data.json"), "w", encoding="utf-8") as f:
         json.dump(data, f, indent=1)
+    page = standalone(body)
     with open(os.path.join(HERE, "artifact_page.html"), "w", encoding="utf-8") as f:
         f.write(body)
     with open(os.path.join(HERE, "overlay_desk.html"), "w", encoding="utf-8") as f:
-        f.write(WRAPPER.format(body=body))
+        f.write(page)
+    # GitHub Pages serves the repo root, so the dashboard lives there too --
+    # viewing an .html file on github.com itself only ever shows its source.
+    with open(os.path.join(HERE, os.pardir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(page)
 
     n = len(data["books"]["A"]["monthly"])
     print(f"data: {n} months, {len(data['regime'])} regimes, "
           f"{data['meta']['cycles']} option cycles "
           f"({data['meta']['from']} .. {data['meta']['to']})")
-    for f in ("overlay_desk.html", "artifact_page.html", "dash_data.json"):
+    for f in ("overlay_desk.html", "artifact_page.html", "dash_data.json",
+              os.path.join(os.pardir, "index.html")):
         p = os.path.join(HERE, f)
-        print(f"  {f:<22} {os.path.getsize(p):>8,} bytes")
+        print(f"  {f:<24} {os.path.getsize(p):>8,} bytes")
 
 
 if __name__ == "__main__":
