@@ -1,0 +1,582 @@
+<title>Overlay Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f2f4f6; --panel:#ffffff; --panel-2:#f7f9fa; --line:#dde3e8; --line-soft:#e9eef2;
+  --ink:#141a20; --ink-2:#4d5a66; --ink-3:#77838d;
+  --a:#A16207; --d:#1D6FA8; --alone:#8b96a0;
+  --pos:#2a78d6; --neg:#d03b3b; --mid:#f0efec;
+  --good:#0ca30c; --crit:#d03b3b; --warn:#fab219;
+  --shadow:0 1px 2px rgba(20,26,32,.06),0 1px 3px rgba(20,26,32,.04);
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#10141a; --panel:#181e26; --panel-2:#1e252e; --line:#2c353f; --line-soft:#232b34;
+    --ink:#e8edf2; --ink-2:#a3b0bc; --ink-3:#7c8894;
+    --a:#C4870F; --d:#4A97CE; --alone:#6d7883;
+    --pos:#3987e5; --neg:#e06060; --mid:#383835;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#10141a; --panel:#181e26; --panel-2:#1e252e; --line:#2c353f; --line-soft:#232b34;
+  --ink:#e8edf2; --ink-2:#a3b0bc; --ink-3:#7c8894;
+  --a:#C4870F; --d:#4A97CE; --alone:#6d7883;
+  --pos:#3987e5; --neg:#e06060; --mid:#383835;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:0 56px}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);
+  border-bottom:1px solid var(--line);margin-bottom:22px}
+.hrow{max-width:1180px;margin:0 auto;padding:16px 20px 0;
+  display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between}
+.brand h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.015em}
+.brand p{margin:3px 0 0;font-size:12.5px;color:var(--ink-2);max-width:62ch}
+.eyebrow{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;font-family:var(--mono)}
+.seg{display:flex;gap:2px;background:var(--panel-2);border:1px solid var(--line);
+  border-radius:7px;padding:2px}
+.seg button{appearance:none;border:0;background:transparent;color:var(--ink-2);
+  font:500 12.5px/1 var(--sans);padding:7px 13px;border-radius:5px;cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+.seg button:focus-visible{outline:2px solid var(--d);outline-offset:1px}
+nav{max-width:1180px;margin:0 auto;padding:12px 20px 0;display:flex;gap:22px;overflow-x:auto}
+nav button{appearance:none;border:0;background:transparent;cursor:pointer;
+  font:600 13px/1 var(--sans);color:var(--ink-3);padding:0 0 11px;
+  border-bottom:2px solid transparent;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--sel,var(--d))}
+nav button:focus-visible{outline:2px solid var(--d);outline-offset:2px}
+
+/* panels */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:18px;box-shadow:var(--shadow)}
+.panel h2{margin:0;font-size:14.5px;font-weight:600;letter-spacing:-.01em}
+.panel .sub{margin:3px 0 0;font-size:12px;color:var(--ink-2)}
+.stack{display:flex;flex-direction:column;gap:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+
+/* kpi strip */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:10px;overflow:hidden}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:480px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);padding:13px 14px 14px}
+.kpi .k{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:600;font-family:var(--mono)}
+.kpi .v{font-family:var(--mono);font-size:21px;font-weight:600;letter-spacing:-.02em;
+  margin-top:5px;font-variant-numeric:tabular-nums}
+.kpi .dlt{font-size:11.5px;margin-top:2px;color:var(--ink-2);font-family:var(--mono)}
+.up{color:var(--good)} .dn{color:var(--crit)}
+
+/* charts */
+svg{display:block;width:100%;height:auto;overflow:visible}
+.gl{stroke:var(--line-soft);stroke-width:1}
+.ax{fill:var(--ink-3);font-family:var(--mono);font-size:10px}
+.zero{stroke:var(--ink-3);stroke-width:1;opacity:.5}
+.dlabel{font-family:var(--mono);font-size:10.5px;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 12px;padding:0;list-style:none;
+  font-size:12px;color:var(--ink-2)}
+.legend li{display:flex;align-items:center;gap:7px}
+.sw{width:15px;height:3px;border-radius:2px;flex:none}
+.sw.dash{background:repeating-linear-gradient(90deg,var(--alone) 0 5px,transparent 5px 9px)}
+figcaption{margin-top:11px;font-size:11.5px;color:var(--ink-3);line-height:1.5}
+
+/* tooltip */
+.tip{position:fixed;pointer-events:none;z-index:60;background:var(--panel);
+  border:1px solid var(--line);border-radius:7px;padding:8px 10px;box-shadow:var(--shadow);
+  font-size:12px;opacity:0;transition:opacity .09s;min-width:130px}
+.tip[data-on="1"]{opacity:1}
+.tip b{display:block;font-size:11px;color:var(--ink-3);font-family:var(--mono);
+  font-weight:600;letter-spacing:.04em;margin-bottom:4px}
+.tip .r{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);
+  font-variant-numeric:tabular-nums}
+.tip .r span:first-child{color:var(--ink-2)}
+
+/* tables */
+.tscroll{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:520px}
+th,td{padding:8px 11px;text-align:right;border-bottom:1px solid var(--line-soft);white-space:nowrap}
+th{background:var(--panel-2);font-weight:600;font-size:10.5px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-3);font-family:var(--mono);position:sticky;top:0}
+th:first-child,td:first-child{text-align:left}
+tbody tr:last-child td{border-bottom:0}
+tbody tr.tot td{font-weight:600;background:var(--panel-2)}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* heatmap */
+.hm{display:grid;grid-template-columns:44px repeat(12,1fr);gap:2px;min-width:620px}
+.hm div{font-family:var(--mono);font-size:10.5px;font-variant-numeric:tabular-nums;
+  display:flex;align-items:center;justify-content:center;border-radius:3px;height:30px}
+.hm .hh{color:var(--ink-3);font-weight:600;height:20px}
+.hm .yr{color:var(--ink-2);font-weight:600;justify-content:flex-end;padding-right:7px}
+.hm .cell{cursor:default}
+.hmwrap{overflow-x:auto}
+
+/* regime bars */
+.rgrid{display:grid;grid-template-columns:84px 1fr 96px;gap:9px 12px;align-items:center;
+  font-size:12.5px}
+.rbar{height:19px;border-radius:0 3px 3px 0;position:relative}
+.rname{color:var(--ink-2);font-weight:500}
+.rval{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+
+.note{border-left:2px solid var(--warn);padding:10px 0 10px 13px;margin-top:16px;
+  font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.note strong{color:var(--ink);font-weight:600}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header>
+  <div class="hrow">
+    <div class="brand">
+      <div class="eyebrow">NIFTY equity replica + conditioned call</div>
+      <h1>Overlay Desk</h1>
+      <p>Backtest on a fixed ₹1 crore, profit booked out monthly, nothing compounded.
+         Feb 2021 – Sep 2026 · 68 months · 292 option cycles.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Select book">
+      <button data-book="A" aria-pressed="true">Model A</button>
+      <button data-book="D" aria-pressed="false">Model D</button>
+      <button data-book="C" aria-pressed="false">Compare</button>
+    </div>
+  </div>
+  <nav role="tablist">
+    <button role="tab" data-tab="ov" aria-selected="true">Overview</button>
+    <button role="tab" data-tab="pnl" aria-selected="false">P&amp;L history</button>
+    <button role="tab" data-tab="eng" aria-selected="false">Option engine</button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+
+  <!-- OVERVIEW -->
+  <section id="ov" class="stack" style="margin-top:18px">
+    <figure class="panel" style="margin:0">
+      <h2>Cumulative profit on ₹1 crore</h2>
+      <p class="sub" id="curveSub"></p>
+      <ul class="legend" id="curveLeg"></ul>
+      <div id="curve"></div>
+      <figcaption>Profit booked out each month, so the line is cumulative rupees withdrawn
+        as a percentage of the ₹1 crore deployed — not a compounding NAV.</figcaption>
+    </figure>
+
+    <figure class="panel" style="margin:0">
+      <h2>Underwater — distance below the previous peak</h2>
+      <p class="sub">Drawdown on the cumulative booked-profit curve, as a % of ₹1 crore.</p>
+      <div id="uw"></div>
+      <figcaption>Every drawdown in the record recovers. The overlay's job is to make
+        these shallower, not to remove them.</figcaption>
+    </figure>
+
+    <div class="panel">
+      <h2>All four books, same mandate</h2>
+      <p class="sub">The overlay adds return and cuts drawdown on both books.</p>
+      <div class="tscroll">
+        <table id="cmp"><thead><tr>
+          <th>Book</th><th>Return /yr</th><th>Max DD</th><th>Vol</th>
+          <th>Sharpe</th><th>CAR/MDD</th><th>Worst mo.</th><th>Win mo.</th><th>Profit ₹</th>
+        </tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PNL -->
+  <section id="pnl" class="stack" style="margin-top:18px" hidden>
+    <figure class="panel" style="margin:0">
+      <h2>Year by year — where the money came from</h2>
+      <p class="sub" id="yrSub"></p>
+      <ul class="legend">
+        <li><span class="sw" style="background:var(--bk);height:11px;border-radius:3px"></span>Equity book</li>
+        <li><span class="sw" style="background:var(--ink-3);height:11px;border-radius:3px"></span>Option overlay</li>
+      </ul>
+      <div id="yr"></div>
+      <figcaption>The overlay runs counter-cyclical to the book: biggest in the equity
+        book's weakest years, smallest or negative in its strongest.</figcaption>
+    </figure>
+
+    <div class="panel">
+      <h2>Monthly return on ₹1 crore</h2>
+      <p class="sub">Each cell is that month's total P&amp;L — equity plus overlay — as a
+        percentage of the ₹1 crore. Blue is profit, red is loss.</p>
+      <div class="hmwrap"><div class="hm" id="hm"></div></div>
+      <figcaption>Colour is a diverging blue↔red scale rather than green/red so it stays
+        readable for colour-blind viewers; every cell prints its own number, so the value
+        never depends on the colour.</figcaption>
+    </div>
+
+    <div class="panel">
+      <h2>Yearly ledger</h2>
+      <p class="sub">Equity and overlay contribution in rupees, booked out monthly.</p>
+      <div class="tscroll">
+        <table id="yrtab"><thead><tr>
+          <th>Year</th><th>Equity ₹</th><th>Overlay ₹</th><th>Total ₹</th><th>On ₹1 Cr</th>
+        </tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENGINE -->
+  <section id="eng" class="stack" style="margin-top:18px" hidden>
+    <div class="panel">
+      <h2>What the strike rule does</h2>
+      <p class="sub">K = Spot − 100 + 100 × z, where z is how unusual 14-day realised
+        volatility is against its own trailing 252 sessions. Walk-forward parameters.</p>
+      <div class="tscroll">
+        <table id="rg"><thead><tr>
+          <th>Volatility read</th><th>Weeks</th><th>Strike vs spot</th>
+          <th>Premium (pts)</th><th>Avg P&amp;L ₹</th><th>Total ₹</th><th>Win %</th>
+        </tr></thead><tbody></tbody></table>
+      </div>
+      <div class="note" id="engNote"></div>
+    </div>
+
+    <figure class="panel" style="margin:0">
+      <h2>Strike distance by volatility regime</h2>
+      <p class="sub">Negative means the strike sits below spot — the hedge is on.
+        Positive means it sits above — the hedge is off.</p>
+      <div id="rgbar"></div>
+      <figcaption>The rule slides the strike monotonically from 209 points below spot in the
+        calmest weeks to 114 above in the most violent. That slide is the whole strategy.</figcaption>
+    </figure>
+  </section>
+</div>
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const D = {"books":{"A":{"label":"Model A","alone":{"Book":"Model A only","Years":5.63,"Return_pa_%":19.12,"Total_Profit_Rs":10756392,"Max_DD_%":-24.06,"Vol_%":17.3,"Sharpe":0.76,"CAR_MDD":0.79,"Worst_Month_%":-11.78,"Best_Month_%":18.61,"Win_Months_%":64.7,"N_Months":68},"withcall":{"Book":"Model A + conditioned call","Years":5.63,"Return_pa_%":21.56,"Total_Profit_Rs":12128397,"Max_DD_%":-21.67,"Vol_%":14.09,"Sharpe":1.11,"CAR_MDD":0.99,"Worst_Month_%":-9.83,"Best_Month_%":13.61,"Win_Months_%":61.8,"N_Months":68},"monthly":[{"m":"2021-02","eq":1051627,"op":-250380,"tot":801247,"pct":8.01},{"m":"2021-03","eq":3661,"op":105404,"tot":109065,"pct":1.09},{"m":"2021-04","eq":207154,"op":-231623,"tot":-24469,"pct":-0.24},{"m":"2021-05","eq":735829,"op":72512,"tot":808341,"pct":8.08},{"m":"2021-06","eq":-2300,"op":49121,"tot":46821,"pct":0.47},{"m":"2021-07","eq":462263,"op":-13910,"tot":448353,"pct":4.48},{"m":"2021-08","eq":612183,"op":-149195,"tot":462988,"pct":4.63},{"m":"2021-09","eq":197039,"op":-218324,"tot":-21285,"pct":-0.21},{"m":"2021-10","eq":456304,"op":52547,"tot":508851,"pct":5.09},{"m":"2021-11","eq":-512377,"op":259872,"tot":-252505,"pct":-2.53},{"m":"2021-12","eq":226715,"op":-297754,"tot":-71039,"pct":-0.71},{"m":"2022-01","eq":276105,"op":152134,"tot":428239,"pct":4.28},{"m":"2022-02","eq":-405689,"op":29970,"tot":-375719,"pct":-3.76},{"m":"2022-03","eq":438400,"op":-316003,"tot":122397,"pct":1.22},{"m":"2022-04","eq":-408765,"op":-70280,"tot":-479045,"pct":-4.79},{"m":"2022-05","eq":-613481,"op":265528,"tot":-347953,"pct":-3.48},{"m":"2022-06","eq":-717211,"op":291742,"tot":-425469,"pct":-4.25},{"m":"2022-07","eq":1861291,"op":-500248,"tot":1361043,"pct":13.61},{"m":"2022-08","eq":365574,"op":-47677,"tot":317897,"pct":3.18},{"m":"2022-09","eq":-162908,"op":153193,"tot":-9715,"pct":-0.1},{"m":"2022-10","eq":272223,"op":-227557,"tot":44666,"pct":0.45},{"m":"2022-11","eq":-155653,"op":125959,"tot":-29694,"pct":-0.3},{"m":"2022-12","eq":-316282,"op":146666,"tot":-169616,"pct":-1.7},{"m":"2023-01","eq":-491602,"op":235887,"tot":-255715,"pct":-2.56},{"m":"2023-02","eq":-127169,"op":90040,"tot":-37129,"pct":-0.37},{"m":"2023-03","eq":-186787,"op":177549,"tot":-9238,"pct":-0.09},{"m":"2023-04","eq":396034,"op":-187667,"tot":208367,"pct":2.08},{"m":"2023-05","eq":473667,"op":49593,"tot":523260,"pct":5.23},{"m":"2023-06","eq":395095,"op":135021,"tot":530116,"pct":5.3},{"m":"2023-07","eq":420681,"op":-106062,"tot":314619,"pct":3.15},{"m":"2023-08","eq":-247243,"op":194722,"tot":-52521,"pct":-0.53},{"m":"2023-09","eq":373373,"op":71925,"tot":445298,"pct":4.45},{"m":"2023-10","eq":73867,"op":119356,"tot":193223,"pct":1.93},{"m":"2023-11","eq":732961,"op":-161730,"tot":571231,"pct":5.71},{"m":"2023-12","eq":569002,"op":-147569,"tot":421433,"pct":4.21},{"m":"2024-01","eq":120938,"op":107761,"tot":228699,"pct":2.29},{"m":"2024-02","eq":160528,"op":140241,"tot":300769,"pct":3.01},{"m":"2024-03","eq":126858,"op":-85449,"tot":41409,"pct":0.41},{"m":"2024-04","eq":22100,"op":32196,"tot":54296,"pct":0.54},{"m":"2024-05","eq":-26085,"op":-37439,"tot":-63524,"pct":-0.64},{"m":"2024-06","eq":468140,"op":-231287,"tot":236853,"pct":2.37},{"m":"2024-07","eq":668828,"op":-4664,"tot":664164,"pct":6.64},{"m":"2024-08","eq":322856,"op":-14916,"tot":307940,"pct":3.08},{"m":"2024-09","eq":497310,"op":-118201,"tot":379109,"pct":3.79},{"m":"2024-10","eq":-980392,"op":321231,"tot":-659161,"pct":-6.59},{"m":"2024-11","eq":-351733,"op":209800,"tot":-141933,"pct":-1.42},{"m":"2024-12","eq":-192885,"op":106659,"tot":-86226,"pct":-0.86},{"m":"2025-01","eq":435496,"op":-181972,"tot":253524,"pct":2.54},{"m":"2025-02","eq":-275516,"op":174369,"tot":-101147,"pct":-1.01},{"m":"2025-03","eq":666679,"op":-178371,"tot":488308,"pct":4.88},{"m":"2025-04","eq":-109388,"op":-41484,"tot":-150872,"pct":-1.51},{"m":"2025-05","eq":344526,"op":21739,"tot":366265,"pct":3.66},{"m":"2025-06","eq":608951,"op":-97437,"tot":511514,"pct":5.12},{"m":"2025-07","eq":-402705,"op":241848,"tot":-160857,"pct":-1.61},{"m":"2025-08","eq":-330136,"op":44345,"tot":-285791,"pct":-2.86},{"m":"2025-09","eq":301322,"op":34773,"tot":336095,"pct":3.36},{"m":"2025-10","eq":1041613,"op":-102353,"tot":939260,"pct":9.39},{"m":"2025-11","eq":505019,"op":136706,"tot":641725,"pct":6.42},{"m":"2025-12","eq":653413,"op":202700,"tot":856113,"pct":8.56},{"m":"2026-01","eq":145035,"op":221630,"tot":366665,"pct":3.67},{"m":"2026-02","eq":296449,"op":-375722,"tot":-79273,"pct":-0.79},{"m":"2026-03","eq":-1178430,"op":195133,"tot":-983297,"pct":-9.83},{"m":"2026-04","eq":897447,"op":81662,"tot":979109,"pct":9.79},{"m":"2026-05","eq":-306,"op":197131,"tot":196825,"pct":1.97},{"m":"2026-06","eq":275640,"op":197139,"tot":472779,"pct":4.73},{"m":"2026-07","eq":235330,"op":49309,"tot":284639,"pct":2.85},{"m":"2026-08","eq":23616,"op":93768,"tot":117384,"pct":1.17},{"m":"2026-09","eq":-467705,"op":178398,"tot":-289307,"pct":-2.89}],"yearly":[{"y":2021,"eq":3438097,"op":-621730,"tot":2816367,"pct":28.16},{"y":2022,"eq":433604,"op":3427,"tot":437031,"pct":4.37},{"y":2023,"eq":2381878,"op":471065,"tot":2852943,"pct":28.53},{"y":2024,"eq":836464,"op":425932,"tot":1262396,"pct":12.62},{"y":2025,"eq":3439273,"op":254863,"tot":3694136,"pct":36.94},{"y":2026,"eq":227077,"op":838448,"tot":1065525,"pct":10.66}],"curve":[{"d":"2021-02","p":8.01,"dd":0.0},{"d":"2021-03","p":9.1,"dd":0.0},{"d":"2021-04","p":8.86,"dd":-0.24},{"d":"2021-05","p":16.94,"dd":0.0},{"d":"2021-06","p":17.41,"dd":0.0},{"d":"2021-07","p":21.89,"dd":0.0},{"d":"2021-08","p":26.52,"dd":0.0},{"d":"2021-09","p":26.31,"dd":-0.21},{"d":"2021-10","p":31.4,"dd":0.0},{"d":"2021-11","p":28.87,"dd":-2.53},{"d":"2021-12","p":28.16,"dd":-3.24},{"d":"2022-01","p":32.45,"dd":0.0},{"d":"2022-02","p":28.69,"dd":-3.76},{"d":"2022-03","p":29.91,"dd":-2.53},{"d":"2022-04","p":25.12,"dd":-7.32},{"d":"2022-05","p":21.64,"dd":-10.8},{"d":"2022-06","p":17.39,"dd":-15.06},{"d":"2022-07","p":31.0,"dd":-1.45},{"d":"2022-08","p":34.18,"dd":0.0},{"d":"2022-09","p":34.08,"dd":-0.1},{"d":"2022-10","p":34.53,"dd":0.0},{"d":"2022-11","p":34.23,"dd":-0.3},{"d":"2022-12","p":32.53,"dd":-1.99},{"d":"2023-01","p":29.98,"dd":-4.55},{"d":"2023-02","p":29.61,"dd":-4.92},{"d":"2023-03","p":29.51,"dd":-5.01},{"d":"2023-04","p":31.6,"dd":-2.93},{"d":"2023-05","p":36.83,"dd":0.0},{"d":"2023-06","p":42.13,"dd":0.0},{"d":"2023-07","p":45.28,"dd":0.0},{"d":"2023-08","p":44.75,"dd":-0.53},{"d":"2023-09","p":49.2,"dd":0.0},{"d":"2023-10","p":51.14,"dd":0.0},{"d":"2023-11","p":56.85,"dd":0.0},{"d":"2023-12","p":61.06,"dd":0.0},{"d":"2024-01","p":63.35,"dd":0.0},{"d":"2024-02","p":66.36,"dd":0.0},{"d":"2024-03","p":66.77,"dd":0.0},{"d":"2024-04","p":67.32,"dd":0.0},{"d":"2024-05","p":66.68,"dd":-0.64},{"d":"2024-06","p":69.05,"dd":0.0},{"d":"2024-07","p":75.69,"dd":0.0},{"d":"2024-08","p":78.77,"dd":0.0},{"d":"2024-09","p":82.56,"dd":0.0},{"d":"2024-10","p":75.97,"dd":-6.59},{"d":"2024-11","p":74.55,"dd":-8.01},{"d":"2024-12","p":73.69,"dd":-8.87},{"d":"2025-01","p":76.22,"dd":-6.34},{"d":"2025-02","p":75.21,"dd":-7.35},{"d":"2025-03","p":80.09,"dd":-2.47},{"d":"2025-04","p":78.59,"dd":-3.98},{"d":"2025-05","p":82.25,"dd":-0.31},{"d":"2025-06","p":87.36,"dd":0.0},{"d":"2025-07","p":85.75,"dd":-1.61},{"d":"2025-08","p":82.9,"dd":-4.47},{"d":"2025-09","p":86.26,"dd":-1.11},{"d":"2025-10","p":95.65,"dd":0.0},{"d":"2025-11","p":102.07,"dd":0.0},{"d":"2025-12","p":110.63,"dd":0.0},{"d":"2026-01","p":114.3,"dd":0.0},{"d":"2026-02","p":113.5,"dd":-0.79},{"d":"2026-03","p":103.67,"dd":-10.63},{"d":"2026-04","p":113.46,"dd":-0.83},{"d":"2026-05","p":115.43,"dd":0.0},{"d":"2026-06","p":120.16,"dd":0.0},{"d":"2026-07","p":123.0,"dd":0.0},{"d":"2026-08","p":124.18,"dd":0.0},{"d":"2026-09","p":121.28,"dd":-2.89}]},"D":{"label":"Model D","alone":{"Book":"Model D only","Years":5.63,"Return_pa_%":16.25,"Total_Profit_Rs":9142768,"Max_DD_%":-17.51,"Vol_%":15.62,"Sharpe":0.66,"CAR_MDD":0.93,"Worst_Month_%":-11.75,"Best_Month_%":12.32,"Win_Months_%":64.7,"N_Months":68},"withcall":{"Book":"Model D + conditioned call","Years":5.63,"Return_pa_%":18.69,"Total_Profit_Rs":10514773,"Max_DD_%":-15.94,"Vol_%":12.29,"Sharpe":1.04,"CAR_MDD":1.17,"Worst_Month_%":-9.79,"Best_Month_%":9.82,"Win_Months_%":66.2,"N_Months":68},"monthly":[{"m":"2021-02","eq":1232037,"op":-250380,"tot":981657,"pct":9.82},{"m":"2021-03","eq":-118839,"op":105404,"tot":-13435,"pct":-0.13},{"m":"2021-04","eq":100306,"op":-231623,"tot":-131317,"pct":-1.31},{"m":"2021-05","eq":757855,"op":72512,"tot":830367,"pct":8.3},{"m":"2021-06","eq":33191,"op":49121,"tot":82312,"pct":0.82},{"m":"2021-07","eq":371537,"op":-13910,"tot":357627,"pct":3.58},{"m":"2021-08","eq":891910,"op":-149195,"tot":742715,"pct":7.43},{"m":"2021-09","eq":398959,"op":-218324,"tot":180635,"pct":1.81},{"m":"2021-10","eq":227696,"op":52547,"tot":280243,"pct":2.8},{"m":"2021-11","eq":-453356,"op":259872,"tot":-193484,"pct":-1.93},{"m":"2021-12","eq":233802,"op":-297754,"tot":-63952,"pct":-0.64},{"m":"2022-01","eq":202717,"op":152134,"tot":354851,"pct":3.55},{"m":"2022-02","eq":-232727,"op":29970,"tot":-202757,"pct":-2.03},{"m":"2022-03","eq":411225,"op":-316003,"tot":95222,"pct":0.95},{"m":"2022-04","eq":-89916,"op":-70280,"tot":-160196,"pct":-1.6},{"m":"2022-05","eq":-630530,"op":265528,"tot":-365002,"pct":-3.65},{"m":"2022-06","eq":-586110,"op":291742,"tot":-294368,"pct":-2.94},{"m":"2022-07","eq":1159764,"op":-500248,"tot":659516,"pct":6.6},{"m":"2022-08","eq":475585,"op":-47677,"tot":427908,"pct":4.28},{"m":"2022-09","eq":-132862,"op":153193,"tot":20331,"pct":0.2},{"m":"2022-10","eq":534894,"op":-227557,"tot":307337,"pct":3.07},{"m":"2022-11","eq":224365,"op":125959,"tot":350324,"pct":3.5},{"m":"2022-12","eq":-332491,"op":146666,"tot":-185825,"pct":-1.86},{"m":"2023-01","eq":-554832,"op":235887,"tot":-318945,"pct":-3.19},{"m":"2023-02","eq":-353340,"op":90040,"tot":-263300,"pct":-2.63},{"m":"2023-03","eq":-18487,"op":177549,"tot":159062,"pct":1.59},{"m":"2023-04","eq":494963,"op":-187667,"tot":307296,"pct":3.07},{"m":"2023-05","eq":413900,"op":49593,"tot":463493,"pct":4.63},{"m":"2023-06","eq":465804,"op":135021,"tot":600825,"pct":6.01},{"m":"2023-07","eq":339749,"op":-106062,"tot":233687,"pct":2.34},{"m":"2023-08","eq":-175459,"op":194722,"tot":19263,"pct":0.19},{"m":"2023-09","eq":260458,"op":71925,"tot":332383,"pct":3.32},{"m":"2023-10","eq":-298664,"op":119356,"tot":-179308,"pct":-1.79},{"m":"2023-11","eq":640388,"op":-161730,"tot":478658,"pct":4.79},{"m":"2023-12","eq":862237,"op":-147569,"tot":714668,"pct":7.15},{"m":"2024-01","eq":81912,"op":107761,"tot":189673,"pct":1.9},{"m":"2024-02","eq":275692,"op":140241,"tot":415933,"pct":4.16},{"m":"2024-03","eq":146970,"op":-85449,"tot":61521,"pct":0.62},{"m":"2024-04","eq":216043,"op":32196,"tot":248239,"pct":2.48},{"m":"2024-05","eq":57571,"op":-37439,"tot":20132,"pct":0.2},{"m":"2024-06","eq":706205,"op":-231287,"tot":474918,"pct":4.75},{"m":"2024-07","eq":451473,"op":-4664,"tot":446809,"pct":4.47},{"m":"2024-08","eq":53967,"op":-14916,"tot":39051,"pct":0.39},{"m":"2024-09","eq":263570,"op":-118201,"tot":145369,"pct":1.45},{"m":"2024-10","eq":-471574,"op":321231,"tot":-150343,"pct":-1.5},{"m":"2024-11","eq":-76348,"op":209800,"tot":133452,"pct":1.33},{"m":"2024-12","eq":-138454,"op":106659,"tot":-31795,"pct":-0.32},{"m":"2025-01","eq":2130,"op":-181972,"tot":-179842,"pct":-1.8},{"m":"2025-02","eq":-565200,"op":174369,"tot":-390831,"pct":-3.91},{"m":"2025-03","eq":773268,"op":-178371,"tot":594897,"pct":5.95},{"m":"2025-04","eq":177365,"op":-41484,"tot":135881,"pct":1.36},{"m":"2025-05","eq":298357,"op":21739,"tot":320096,"pct":3.2},{"m":"2025-06","eq":480108,"op":-97437,"tot":382671,"pct":3.83},{"m":"2025-07","eq":-419316,"op":241848,"tot":-177468,"pct":-1.77},{"m":"2025-08","eq":-200898,"op":44345,"tot":-156553,"pct":-1.57},{"m":"2025-09","eq":109274,"op":34773,"tot":144047,"pct":1.44},{"m":"2025-10","eq":592119,"op":-102353,"tot":489766,"pct":4.9},{"m":"2025-11","eq":152324,"op":136706,"tot":289030,"pct":2.89},{"m":"2025-12","eq":9116,"op":202700,"tot":211816,"pct":2.12},{"m":"2026-01","eq":-455148,"op":221630,"tot":-233518,"pct":-2.34},{"m":"2026-02","eq":121844,"op":-375722,"tot":-253878,"pct":-2.54},{"m":"2026-03","eq":-1174514,"op":195133,"tot":-979381,"pct":-9.79},{"m":"2026-04","eq":873900,"op":81662,"tot":955562,"pct":9.56},{"m":"2026-05","eq":-64368,"op":197131,"tot":132763,"pct":1.33},{"m":"2026-06","eq":283044,"op":197139,"tot":480183,"pct":4.8},{"m":"2026-07","eq":355506,"op":49309,"tot":404815,"pct":4.05},{"m":"2026-08","eq":-239738,"op":93768,"tot":-145970,"pct":-1.46},{"m":"2026-09","eq":-289158,"op":178398,"tot":-110760,"pct":-1.11}],"yearly":[{"y":2021,"eq":3675099,"op":-621730,"tot":3053369,"pct":30.53},{"y":2022,"eq":1003914,"op":3427,"tot":1007341,"pct":10.07},{"y":2023,"eq":2076716,"op":471065,"tot":2547781,"pct":25.48},{"y":2024,"eq":1567025,"op":425932,"tot":1992957,"pct":19.93},{"y":2025,"eq":1408646,"op":254863,"tot":1663509,"pct":16.64},{"y":2026,"eq":-588632,"op":838448,"tot":249816,"pct":2.5}],"curve":[{"d":"2021-02","p":9.82,"dd":0.0},{"d":"2021-03","p":9.68,"dd":-0.13},{"d":"2021-04","p":8.37,"dd":-1.45},{"d":"2021-05","p":16.67,"dd":0.0},{"d":"2021-06","p":17.5,"dd":0.0},{"d":"2021-07","p":21.07,"dd":0.0},{"d":"2021-08","p":28.5,"dd":0.0},{"d":"2021-09","p":30.31,"dd":0.0},{"d":"2021-10","p":33.11,"dd":0.0},{"d":"2021-11","p":31.17,"dd":-1.93},{"d":"2021-12","p":30.53,"dd":-2.57},{"d":"2022-01","p":34.08,"dd":0.0},{"d":"2022-02","p":32.05,"dd":-2.03},{"d":"2022-03","p":33.01,"dd":-1.08},{"d":"2022-04","p":31.4,"dd":-2.68},{"d":"2022-05","p":27.75,"dd":-6.33},{"d":"2022-06","p":24.81,"dd":-9.27},{"d":"2022-07","p":31.41,"dd":-2.68},{"d":"2022-08","p":35.69,"dd":0.0},{"d":"2022-09","p":35.89,"dd":0.0},{"d":"2022-10","p":38.96,"dd":0.0},{"d":"2022-11","p":42.47,"dd":0.0},{"d":"2022-12","p":40.61,"dd":-1.86},{"d":"2023-01","p":37.42,"dd":-5.05},{"d":"2023-02","p":34.78,"dd":-7.68},{"d":"2023-03","p":36.38,"dd":-6.09},{"d":"2023-04","p":39.45,"dd":-3.02},{"d":"2023-05","p":44.08,"dd":0.0},{"d":"2023-06","p":50.09,"dd":0.0},{"d":"2023-07","p":52.43,"dd":0.0},{"d":"2023-08","p":52.62,"dd":0.0},{"d":"2023-09","p":55.94,"dd":0.0},{"d":"2023-10","p":54.15,"dd":-1.79},{"d":"2023-11","p":58.94,"dd":0.0},{"d":"2023-12","p":66.08,"dd":0.0},{"d":"2024-01","p":67.98,"dd":0.0},{"d":"2024-02","p":72.14,"dd":0.0},{"d":"2024-03","p":72.76,"dd":0.0},{"d":"2024-04","p":75.24,"dd":0.0},{"d":"2024-05","p":75.44,"dd":0.0},{"d":"2024-06","p":80.19,"dd":0.0},{"d":"2024-07","p":84.66,"dd":0.0},{"d":"2024-08","p":85.05,"dd":0.0},{"d":"2024-09","p":86.5,"dd":0.0},{"d":"2024-10","p":85.0,"dd":-1.5},{"d":"2024-11","p":86.33,"dd":-0.17},{"d":"2024-12","p":86.01,"dd":-0.49},{"d":"2025-01","p":84.22,"dd":-2.29},{"d":"2025-02","p":80.31,"dd":-6.19},{"d":"2025-03","p":86.26,"dd":-0.24},{"d":"2025-04","p":87.62,"dd":0.0},{"d":"2025-05","p":90.82,"dd":0.0},{"d":"2025-06","p":94.64,"dd":0.0},{"d":"2025-07","p":92.87,"dd":-1.77},{"d":"2025-08","p":91.3,"dd":-3.34},{"d":"2025-09","p":92.74,"dd":-1.9},{"d":"2025-10","p":97.64,"dd":0.0},{"d":"2025-11","p":100.53,"dd":0.0},{"d":"2025-12","p":102.65,"dd":0.0},{"d":"2026-01","p":100.31,"dd":-2.34},{"d":"2026-02","p":97.78,"dd":-4.87},{"d":"2026-03","p":87.98,"dd":-14.67},{"d":"2026-04","p":97.54,"dd":-5.11},{"d":"2026-05","p":98.87,"dd":-3.78},{"d":"2026-06","p":103.67,"dd":0.0},{"d":"2026-07","p":107.72,"dd":0.0},{"d":"2026-08","p":106.26,"dd":-1.46},{"d":"2026-09","p":105.15,"dd":-2.57}]}},"meta":{"cycles":292,"from":"2021-02-02","to":"2026-09-08","optTotal":1372005,"optWin":61.3,"best":116861,"worst":-346329},"regime":[{"name":"Very quiet","weeks":46,"money":-209,"prem":234.7,"avg":12030,"tot":553373,"win":54.3},{"name":"Quiet","weeks":94,"money":-143,"prem":192.6,"avg":6527,"tot":613569,"win":61.7},{"name":"Normal","weeks":84,"money":-78,"prem":158.9,"avg":3472,"tot":291678,"win":59.5},{"name":"Busy","weeks":29,"money":-10,"prem":133.1,"avg":3073,"tot":89113,"win":65.5},{"name":"Violent","weeks":39,"money":114,"prem":89.4,"avg":-4506,"tot":-175728,"win":69.2}]};
+const CAP = 1e7;
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const $ = s => document.querySelector(s);
+const el = (t,a={}) => Object.assign(document.createElement(t),a);
+let book = "A", tab = "ov";
+
+const fmtPct = v => (v>=0?"+":"") + v.toFixed(2) + "%";
+const fmtRs = v => {
+  const s = v<0?"−":"", n = Math.abs(v);
+  if (n >= 1e7) return s+"₹"+(n/1e7).toFixed(2)+" Cr";
+  if (n >= 1e5) return s+"₹"+(n/1e5).toFixed(2)+" L";
+  return s+"₹"+Math.round(n).toLocaleString("en-IN");
+};
+const hue = b => b==="D" ? "var(--d)" : "var(--a)";
+
+/* ---------- tooltip ---------- */
+const tip = $("#tip");
+function showTip(e, title, rows){
+  tip.innerHTML = "<b>"+title+"</b>" + rows.map(r =>
+    `<div class="r"><span>${r[0]}</span><span style="color:${r[2]||"var(--ink)"}">${r[1]}</span></div>`).join("");
+  tip.dataset.on = "1";
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = e.clientX + 14, y = e.clientY - h - 10;
+  if (x + w > innerWidth - 8) x = e.clientX - w - 14;
+  if (y < 8) y = e.clientY + 16;
+  tip.style.left = x+"px"; tip.style.top = y+"px";
+}
+const hideTip = () => tip.dataset.on = "0";
+addEventListener("scroll", hideTip, {passive:true});
+
+/* ---------- KPI strip ---------- */
+function kpis(){
+  const wrap = $("#kpis"); wrap.innerHTML = "";
+  const mk = (k,v,d,cls) => {
+    const c = el("div",{className:"kpi"});
+    c.append(el("div",{className:"k",textContent:k}), el("div",{className:"v",textContent:v}));
+    if (d) c.append(el("div",{className:"dlt "+(cls||""),textContent:d}));
+    wrap.append(c);
+  };
+  if (book === "C"){
+    const a = D.books.A.withcall, d = D.books.D.withcall;
+    mk("Return /yr", a["Return_pa_%"].toFixed(2)+"%", "Model D "+d["Return_pa_%"].toFixed(2)+"%");
+    mk("Max drawdown", a["Max_DD_%"].toFixed(2)+"%", "Model D "+d["Max_DD_%"].toFixed(2)+"%");
+    mk("Sharpe", a.Sharpe.toFixed(2), "Model D "+d.Sharpe.toFixed(2));
+    mk("Return per unit risk", a.CAR_MDD.toFixed(2), "Model D "+d.CAR_MDD.toFixed(2), "up");
+    mk("Win months", a["Win_Months_%"].toFixed(1)+"%", "Model D "+d["Win_Months_%"].toFixed(1)+"%");
+    mk("Total profit", fmtRs(a.Total_Profit_Rs), "Model D "+fmtRs(d.Total_Profit_Rs));
+    return;
+  }
+  const b = D.books[book], w = b.withcall, o = b.alone;
+  const dd = (x,y,inv) => {
+    const v = x - y, s = (v>=0?"+":"")+v.toFixed(2);
+    return [s+" vs alone", (inv ? v<0 : v>0) ? "up":"dn"];
+  };
+  let t;
+  t = dd(w["Return_pa_%"], o["Return_pa_%"]);      mk("Return /yr", w["Return_pa_%"].toFixed(2)+"%", t[0], t[1]);
+  t = dd(w["Max_DD_%"], o["Max_DD_%"]);            mk("Max drawdown", w["Max_DD_%"].toFixed(2)+"%", t[0]+" pp", "up");
+  t = dd(w.Sharpe, o.Sharpe);                      mk("Sharpe", w.Sharpe.toFixed(2), t[0], t[1]);
+  t = dd(w["Vol_%"], o["Vol_%"]);                  mk("Volatility", w["Vol_%"].toFixed(2)+"%", t[0]+" pp", "up");
+  t = dd(w["Worst_Month_%"], o["Worst_Month_%"]);  mk("Worst month", w["Worst_Month_%"].toFixed(2)+"%", t[0]+" pp", "up");
+  mk("Total profit", fmtRs(w.Total_Profit_Rs), "+"+fmtRs(w.Total_Profit_Rs-o.Total_Profit_Rs)+" from overlay", "up");
+}
+
+/* ---------- line chart ---------- */
+function lineChart(node, series, opts){
+  const W=900, H=opts.h||280, P={t:14,r:60,b:26,l:46};
+  const pts = series[0].v.length;
+  let lo=Infinity, hi=-Infinity;
+  series.forEach(s => s.v.forEach(v => { lo=Math.min(lo,v); hi=Math.max(hi,v); }));
+  if (opts.zeroBase) { lo = Math.min(lo,0); hi = Math.max(hi,0); }
+  const pad = (hi-lo)*0.08 || 1; lo-=pad; hi+=pad;
+  const X = i => P.l + i*(W-P.l-P.r)/(pts-1);
+  const Y = v => P.t + (hi-v)*(H-P.t-P.b)/(hi-lo);
+
+  const ticks=[]; const step=niceStep((hi-lo)/4);
+  for(let t=Math.ceil(lo/step)*step; t<=hi; t+=step) ticks.push(+t.toFixed(6));
+
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${opts.aria}">`;
+  ticks.forEach(t => {
+    s += `<line class="gl" x1="${P.l}" y1="${Y(t)}" x2="${W-P.r}" y2="${Y(t)}"/>`;
+    s += `<text class="ax" x="${P.l-8}" y="${Y(t)+3.5}" text-anchor="end">${t.toFixed(0)}%</text>`;
+  });
+  if (lo<0 && hi>0) s += `<line class="zero" x1="${P.l}" y1="${Y(0)}" x2="${W-P.r}" y2="${Y(0)}"/>`;
+
+  const labs = opts.labels;
+  labs.forEach((L,i) => { if(L) s += `<text class="ax" x="${X(i)}" y="${H-8}" text-anchor="middle">${L}</text>`; });
+
+  series.forEach(se => {
+    if (se.fill){
+      let d = `M${X(0)},${Y(0)}`;
+      se.v.forEach((v,i)=> d += `L${X(i)},${Y(v)}`);
+      d += `L${X(pts-1)},${Y(0)}Z`;
+      s += `<path d="${d}" fill="${se.color}" fill-opacity=".16" stroke="none"/>`;
+    }
+    let d = "";
+    se.v.forEach((v,i)=> d += (i?"L":"M")+X(i)+","+Y(v));
+    s += `<path d="${d}" fill="none" stroke="${se.color}" stroke-width="2"
+           stroke-linejoin="round" stroke-linecap="round"${se.dash?' stroke-dasharray="5 4"':''}/>`;
+    const last = se.v[pts-1];
+    s += `<circle cx="${X(pts-1)}" cy="${Y(last)}" r="3.5" fill="${se.color}"
+           stroke="var(--panel)" stroke-width="2"/>`;
+    s += `<text class="dlabel" x="${X(pts-1)+8}" y="${Y(last)+3.5}" fill="${se.color}">${last.toFixed(1)}%</text>`;
+  });
+  s += `<line id="ch" x1="0" y1="${P.t}" x2="0" y2="${H-P.b}" stroke="var(--ink-3)"
+         stroke-width="1" opacity="0"/>`;
+  s += `<rect x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="transparent"/>`;
+  s += `</svg>`;
+  node.innerHTML = s;
+
+  const svg = node.querySelector("svg"), ch = svg.querySelector("#ch");
+  svg.addEventListener("pointermove", e => {
+    const r = svg.getBoundingClientRect();
+    const px = (e.clientX-r.left)/r.width*W;
+    let i = Math.round((px-P.l)/((W-P.l-P.r)/(pts-1)));
+    i = Math.max(0,Math.min(pts-1,i));
+    ch.setAttribute("x1",X(i)); ch.setAttribute("x2",X(i)); ch.setAttribute("opacity",".45");
+    showTip(e, opts.tipTitle(i), series.map(se => [se.name, fmtPct(se.v[i]), se.color]));
+  });
+  svg.addEventListener("pointerleave", ()=>{ ch.setAttribute("opacity","0"); hideTip(); });
+}
+function niceStep(x){
+  const p = Math.pow(10, Math.floor(Math.log10(Math.abs(x)||1)));
+  const n = x/p;
+  return (n<=1?1:n<=2?2:n<=5?5:10)*p;
+}
+
+/* ---------- overview ---------- */
+function overview(){
+  const mkLabels = arr => arr.map((c,i)=> c.d.slice(5)==="01" || i===0 ? c.d.slice(0,4) : "");
+  let series, sub;
+  if (book === "C"){
+    series = [
+      {name:"Model A + call", v:D.books.A.curve.map(c=>c.p), color:"var(--a)"},
+      {name:"Model D + call", v:D.books.D.curve.map(c=>c.p), color:"var(--d)"}];
+    sub = "Both books with the conditioned call overlay.";
+  } else {
+    const b = D.books[book];
+    series = [
+      {name:D.books[book].label+" only", v:b.curve.map(c=>c.p*0), color:"var(--alone)", dash:true},
+      {name:D.books[book].label+" + call", v:b.curve.map(c=>c.p), color:hue(book), fill:true}];
+    // rebuild "alone" curve from its own monthly totals minus the option leg
+    let run=0; series[0].v = b.monthly.map(m => { run += (m.tot-m.op); return +(run/CAP*100).toFixed(2); });
+    sub = D.books[book].label+" on its own against the same book with the weekly call written against it.";
+  }
+  $("#curveSub").textContent = sub;
+  $("#curveLeg").innerHTML = series.map(s =>
+    `<li><span class="sw${s.dash?" dash":""}" style="background:${s.dash?"":s.color}"></span>${s.name}</li>`).join("");
+  const cur = D.books[book==="C"?"A":book].curve;
+  lineChart($("#curve"), series, {labels:mkLabels(cur), zeroBase:true, aria:"Cumulative profit curve",
+    tipTitle:i=>cur[i].d});
+
+  const uw = book==="C"
+    ? [{name:"Model A + call", v:D.books.A.curve.map(c=>c.dd), color:"var(--a)", fill:true},
+       {name:"Model D + call", v:D.books.D.curve.map(c=>c.dd), color:"var(--d)", fill:true}]
+    : [{name:D.books[book].label+" + call", v:D.books[book].curve.map(c=>c.dd), color:hue(book), fill:true}];
+  lineChart($("#uw"), uw, {h:190, labels:mkLabels(cur), zeroBase:true, aria:"Underwater drawdown curve",
+    tipTitle:i=>cur[i].d});
+
+  const rows = [["A","alone"],["A","withcall"],["D","alone"],["D","withcall"]];
+  $("#cmp tbody").innerHTML = rows.map(([k,w])=>{
+    const s = D.books[k][w], on = w==="withcall";
+    return `<tr${on?' class="tot"':''}><td>${s.Book}</td>
+      <td class="n">${s["Return_pa_%"].toFixed(2)}%</td>
+      <td class="n">${s["Max_DD_%"].toFixed(2)}%</td>
+      <td class="n">${s["Vol_%"].toFixed(2)}%</td>
+      <td class="n">${s.Sharpe.toFixed(2)}</td>
+      <td class="n">${s.CAR_MDD.toFixed(2)}</td>
+      <td class="n">${s["Worst_Month_%"].toFixed(2)}%</td>
+      <td class="n">${s["Win_Months_%"].toFixed(1)}%</td>
+      <td class="n">${fmtRs(s.Total_Profit_Rs)}</td></tr>`;
+  }).join("");
+}
+
+/* ---------- P&L ---------- */
+function pnl(){
+  const b = D.books[book==="C"?"A":book];
+  document.documentElement.style.setProperty("--bk", hue(book==="C"?"A":book));
+  $("#yrSub").textContent = b.label + " — equity contribution and overlay contribution, per calendar year.";
+
+  const Y = b.yearly, W=900, H=250, P={t:16,r:14,b:38,l:52};
+  let lo=0, hi=0;
+  Y.forEach(y=>{ [y.eq,y.op].forEach(v=>{lo=Math.min(lo,v);hi=Math.max(hi,v);}); });
+  const pad=(hi-lo)*.1; lo-=pad; hi+=pad;
+  const yy = v => P.t + (hi-v)*(H-P.t-P.b)/(hi-lo);
+  const bw = (W-P.l-P.r)/Y.length, gw = bw*0.32;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Yearly P&L split">`;
+  const step = niceStep((hi-lo)/4);
+  for(let t=Math.ceil(lo/step)*step;t<=hi;t+=step){
+    s += `<line class="gl" x1="${P.l}" y1="${yy(t)}" x2="${W-P.r}" y2="${yy(t)}"/>`;
+    s += `<text class="ax" x="${P.l-8}" y="${yy(t)+3.5}" text-anchor="end">${(t/1e5).toFixed(0)}L</text>`;
+  }
+  s += `<line class="zero" x1="${P.l}" y1="${yy(0)}" x2="${W-P.r}" y2="${yy(0)}"/>`;
+  Y.forEach((y,i)=>{
+    const cx = P.l + i*bw + bw/2;
+    [[y.eq,"var(--bk)",-1],[y.op,"var(--ink-3)",1]].forEach(([v,col,side])=>{
+      const x = cx + (side<0 ? -gw-1 : 1);
+      const h = Math.abs(yy(v)-yy(0));
+      s += `<rect x="${x}" y="${v>=0?yy(v):yy(0)}" width="${gw}" height="${Math.max(h,1)}"
+             rx="3" fill="${col}"/>`;
+    });
+    s += `<text class="ax" x="${cx}" y="${H-20}" text-anchor="middle">${y.y}</text>`;
+    s += `<text class="dlabel" x="${cx}" y="${H-7}" text-anchor="middle"
+           fill="${y.pct>=0?"var(--good)":"var(--crit)"}">${fmtPct(y.pct)}</text>`;
+  });
+  s += `</svg>`;
+  $("#yr").innerHTML = s;
+  $("#yr").querySelectorAll("rect").forEach((r,i)=>{
+    const y = Y[Math.floor(i/2)], isEq = i%2===0;
+    r.addEventListener("pointerenter", e => showTip(e, y.y+" · "+(isEq?"Equity book":"Option overlay"),
+      [["Equity",fmtRs(y.eq)],["Overlay",fmtRs(y.op)],["Total",fmtRs(y.tot)],["On ₹1 Cr",fmtPct(y.pct)]]));
+    r.addEventListener("pointerleave", hideTip);
+  });
+
+  // heatmap
+  const byY = {};
+  b.monthly.forEach(m=>{ const [yr,mo]=m.m.split("-"); (byY[yr]=byY[yr]||{})[+mo-1]=m; });
+  const mx = Math.max(...b.monthly.map(m=>Math.abs(m.pct)));
+  const hm = $("#hm"); hm.innerHTML = "";
+  hm.append(el("div",{className:"hh"}));
+  MON.forEach(m=>hm.append(el("div",{className:"hh",textContent:m})));
+  Object.keys(byY).sort().forEach(yr=>{
+    hm.append(el("div",{className:"yr",textContent:yr}));
+    for(let i=0;i<12;i++){
+      const m = byY[yr][i];
+      const c = el("div",{className:"cell"});
+      if(!m){ c.style.background="var(--panel-2)"; c.style.opacity=".45"; }
+      else {
+        const t = Math.min(Math.abs(m.pct)/mx,1);
+        c.style.background = m.pct>=0
+          ? `color-mix(in oklab, var(--pos) ${(t*72+8).toFixed(0)}%, var(--panel))`
+          : `color-mix(in oklab, var(--neg) ${(t*72+8).toFixed(0)}%, var(--panel))`;
+        c.style.color = t>0.55 ? "#fff" : "var(--ink)";
+        c.textContent = m.pct.toFixed(1);
+        c.addEventListener("pointerenter", e=>showTip(e, MON[i]+" "+yr,
+          [["Equity",fmtRs(m.eq)],["Overlay",fmtRs(m.op)],["Total",fmtRs(m.tot)],["On ₹1 Cr",fmtPct(m.pct)]]));
+        c.addEventListener("pointerleave", hideTip);
+      }
+      hm.append(c);
+    }
+  });
+
+  const tot = Y.reduce((a,y)=>({eq:a.eq+y.eq,op:a.op+y.op,tot:a.tot+y.tot}),{eq:0,op:0,tot:0});
+  $("#yrtab tbody").innerHTML = Y.map(y=>
+    `<tr><td>${y.y}</td><td class="n">${fmtRs(y.eq)}</td><td class="n">${fmtRs(y.op)}</td>
+     <td class="n">${fmtRs(y.tot)}</td>
+     <td class="n ${y.pct>=0?"up":"dn"}">${fmtPct(y.pct)}</td></tr>`).join("")
+    + `<tr class="tot"><td>Total</td><td class="n">${fmtRs(tot.eq)}</td>
+       <td class="n">${fmtRs(tot.op)}</td><td class="n">${fmtRs(tot.tot)}</td>
+       <td class="n">${fmtPct(tot.tot/CAP*100)}</td></tr>`;
+}
+
+/* ---------- engine ---------- */
+function engine(){
+  $("#rg tbody").innerHTML = D.regime.map(r=>
+    `<tr><td>${r.name}</td><td class="n">${r.weeks}</td>
+     <td class="n">${r.money>0?"+":""}${r.money}</td>
+     <td class="n">${r.prem.toFixed(1)}</td>
+     <td class="n ${r.avg>=0?"up":"dn"}">${fmtRs(r.avg)}</td>
+     <td class="n ${r.tot>=0?"up":"dn"}">${fmtRs(r.tot)}</td>
+     <td class="n">${r.win.toFixed(1)}%</td></tr>`).join("");
+
+  const m = D.meta;
+  $("#engNote").innerHTML = `<strong>Read the violent row with care.</strong>
+    The published note has violent weeks as the strategy's main earner. Here they lose money,
+    because this reconstruction does not yet implement the intraweek 300-point re-strike —
+    and a runaway week is exactly when re-striking matters. Every overlay figure on this page
+    is therefore a floor: ${fmtRs(m.optTotal)} across ${m.cycles} cycles,
+    ${m.optWin}% of them profitable, best ${fmtRs(m.best)}, worst ${fmtRs(m.worst)}.`;
+
+  const R = D.regime, W=900, H=200, P={t:10,r:16,b:28,l:96};
+  const vals = R.map(r=>r.money);
+  const lo = Math.min(...vals,0)*1.15, hi = Math.max(...vals,0)*1.35;
+  const X = v => P.l + (v-lo)*(W-P.l-P.r)/(hi-lo);
+  const rh = (H-P.t-P.b)/R.length;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Strike distance by volatility regime">`;
+  s += `<line class="zero" x1="${X(0)}" y1="${P.t}" x2="${X(0)}" y2="${H-P.b}"/>`;
+  R.forEach((r,i)=>{
+    const y = P.t + i*rh + 4, h = rh-9;
+    const x0 = r.money<0 ? X(r.money) : X(0), w = Math.abs(X(r.money)-X(0));
+    // below spot = hedge on (book hue); above spot = hedge off (recessive grey).
+    // Not a good/bad axis - stepping the strike out in violent weeks is the intent.
+    s += `<rect x="${x0}" y="${y}" width="${Math.max(w,2)}" height="${h}" rx="3"
+           fill="${r.money<0?"var(--bk2)":"var(--ink-3)"}" fill-opacity=".85"/>`;
+    s += `<text class="ax" x="${P.l-10}" y="${y+h/2+3.5}" text-anchor="end"
+           style="font-size:11px;fill:var(--ink-2)">${r.name}</text>`;
+    const lx = r.money<0 ? x0-6 : x0+w+6;
+    s += `<text class="dlabel" x="${lx}" y="${y+h/2+3.5}"
+           text-anchor="${r.money<0?"end":"start"}" fill="var(--ink-2)">${r.money>0?"+":""}${r.money} pts</text>`;
+    s += `<text class="ax" x="${X(0)+(r.money<0?6:-6)}" y="${y+h/2+3.5}"
+           text-anchor="${r.money<0?"start":"end"}" style="fill:var(--ink-3)">${r.weeks} wk</text>`;
+  });
+  s += `<text class="ax" x="${X(0)}" y="${H-10}" text-anchor="middle">spot</text></svg>`;
+  document.documentElement.style.setProperty("--bk2", hue(book==="C"?"A":book));
+  $("#rgbar").innerHTML = s;
+}
+
+/* ---------- wiring ---------- */
+function render(){
+  document.documentElement.style.setProperty("--sel", hue(book==="C"?"A":book));
+  document.documentElement.style.setProperty("--bk", hue(book==="C"?"A":book));
+  kpis();
+  if (tab==="ov") overview();
+  if (tab==="pnl") pnl();
+  if (tab==="eng") engine();
+}
+document.querySelectorAll(".seg button").forEach(b =>
+  b.addEventListener("click", ()=>{
+    book = b.dataset.book;
+    document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed", x===b));
+    render();
+  }));
+document.querySelectorAll("nav button").forEach(b =>
+  b.addEventListener("click", ()=>{
+    tab = b.dataset.tab;
+    document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected", x===b));
+    ["ov","pnl","eng"].forEach(t => $("#"+t).hidden = t!==tab);
+    render();
+  }));
+addEventListener("resize", ()=>{ hideTip(); render(); });
+render();
+</script>
