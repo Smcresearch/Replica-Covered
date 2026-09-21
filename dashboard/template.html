@@ -1,259 +1,231 @@
 <title>Overlay Desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600;700&display=swap">
 <style>
 :root{
   color-scheme: light;
-  --bg:#f2f4f6; --panel:#ffffff; --panel-2:#f7f9fa; --line:#dde3e8; --line-soft:#e9eef2;
-  --ink:#141a20; --ink-2:#4d5a66; --ink-3:#77838d;
-  --a:#A16207; --d:#1D6FA8; --alone:#8b96a0;
-  --pos:#2a78d6; --neg:#d03b3b; --mid:#f0efec;
-  --good:#0ca30c; --crit:#d03b3b; --warn:#fab219;
-  --shadow:0 1px 2px rgba(20,26,32,.06),0 1px 3px rgba(20,26,32,.04);
-  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --bg:#eef1f4; --panel:#ffffff; --sunk:#f6f8f9; --rail:#12171d; --rail-2:#1b222a;
+  --line:#dce2e8; --line-2:#e9edf1;
+  --ink:#131920; --ink-2:#4a5763; --ink-3:#7b8894; --ink-4:#a3adb8;
+  --rail-ink:#e9eef3; --rail-ink-2:#8e9aa6;
+  --a:#A16207; --d:#1D6FA8; --alone:#96a1ac;
+  --pos:#2a78d6; --neg:#d03b3b;
+  --good:#0a8f0a; --crit:#d03b3b; --warn:#c98500;
+  --sh:0 1px 2px rgba(19,25,32,.05);
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme: dark;
-    --bg:#10141a; --panel:#181e26; --panel-2:#1e252e; --line:#2c353f; --line-soft:#232b34;
-    --ink:#e8edf2; --ink-2:#a3b0bc; --ink-3:#7c8894;
-    --a:#C4870F; --d:#4A97CE; --alone:#6d7883;
-    --pos:#3987e5; --neg:#e06060; --mid:#383835;
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+    --bg:#0d1116; --panel:#161c23; --sunk:#1b222a; --rail:#0a0e12; --rail-2:#141a21;
+    --line:#28313b; --line-2:#1f272f;
+    --ink:#e7edf3; --ink-2:#a5b2be; --ink-3:#7d8b97; --ink-4:#5e6b77;
+    --rail-ink:#e7edf3; --rail-ink-2:#78848f;
+    --a:#C4870F; --d:#4A97CE; --alone:#68737e;
+    --pos:#3987e5; --neg:#e06060;
+    --good:#4caf50; --crit:#e06060; --warn:#e0a63a;
+    --sh:0 1px 2px rgba(0,0,0,.35);
   }
 }
 :root[data-theme="dark"]{
   color-scheme: dark;
-  --bg:#10141a; --panel:#181e26; --panel-2:#1e252e; --line:#2c353f; --line-soft:#232b34;
-  --ink:#e8edf2; --ink-2:#a3b0bc; --ink-3:#7c8894;
-  --a:#C4870F; --d:#4A97CE; --alone:#6d7883;
-  --pos:#3987e5; --neg:#e06060; --mid:#383835;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+  --bg:#0d1116; --panel:#161c23; --sunk:#1b222a; --rail:#0a0e12; --rail-2:#141a21;
+  --line:#28313b; --line-2:#1f272f;
+  --ink:#e7edf3; --ink-2:#a5b2be; --ink-3:#7d8b97; --ink-4:#5e6b77;
+  --rail-ink:#e7edf3; --rail-ink-2:#78848f;
+  --a:#C4870F; --d:#4A97CE; --alone:#68737e;
+  --pos:#3987e5; --neg:#e06060;
+  --good:#4caf50; --crit:#e06060; --warn:#e0a63a;
+  --sh:0 1px 2px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
-  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:0 56px}
-
-/* header */
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);
-  border-bottom:1px solid var(--line);margin-bottom:22px}
-.hrow{max-width:1180px;margin:0 auto;padding:16px 20px 0;
-  display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between}
-.brand h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.015em}
-.brand p{margin:3px 0 0;font-size:12.5px;color:var(--ink-2);max-width:62ch}
-.eyebrow{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
-  color:var(--ink-3);font-weight:600;font-family:var(--mono)}
-.seg{display:flex;gap:2px;background:var(--panel-2);border:1px solid var(--line);
-  border-radius:7px;padding:2px}
-.seg button{appearance:none;border:0;background:transparent;color:var(--ink-2);
-  font:500 12.5px/1 var(--sans);padding:7px 13px;border-radius:5px;cursor:pointer;white-space:nowrap}
-.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
-.seg button:focus-visible{outline:2px solid var(--d);outline-offset:1px}
-nav{max-width:1180px;margin:0 auto;padding:12px 20px 0;display:flex;gap:22px;overflow-x:auto}
-nav button{appearance:none;border:0;background:transparent;cursor:pointer;
-  font:600 13px/1 var(--sans);color:var(--ink-3);padding:0 0 11px;
-  border-bottom:2px solid transparent;white-space:nowrap}
-nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--sel,var(--d))}
-nav button:focus-visible{outline:2px solid var(--d);outline-offset:2px}
-
-/* panels */
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;
-  padding:18px;box-shadow:var(--shadow)}
-.panel h2{margin:0;font-size:14.5px;font-weight:600;letter-spacing:-.01em}
-.panel .sub{margin:3px 0 0;font-size:12px;color:var(--ink-2)}
-.stack{display:flex;flex-direction:column;gap:18px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media(max-width:860px){.grid2{grid-template-columns:1fr}}
-
-/* kpi strip */
-.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);
-  border:1px solid var(--line);border-radius:10px;overflow:hidden}
-@media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:480px){.kpis{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:var(--panel);padding:13px 14px 14px}
-.kpi .k{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
-  font-weight:600;font-family:var(--mono)}
-.kpi .v{font-family:var(--mono);font-size:21px;font-weight:600;letter-spacing:-.02em;
-  margin-top:5px;font-variant-numeric:tabular-nums}
-.kpi .dlt{font-size:11.5px;margin-top:2px;color:var(--ink-2);font-family:var(--mono)}
+  font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .up{color:var(--good)} .dn{color:var(--crit)}
 
-/* charts */
+/* ── shell ─────────────────────────────────────────────────────────────── */
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100%}
+@media(max-width:920px){.app{grid-template-columns:1fr}}
+
+.rail{background:var(--rail);color:var(--rail-ink);padding:22px 0 28px;
+  display:flex;flex-direction:column;gap:26px;
+  position:sticky;top:0;height:100vh;overflow-y:auto}
+@media(max-width:920px){.rail{position:static;height:auto;padding-bottom:18px}}
+.rail .pad{padding-inline:20px}
+.brand{display:flex;align-items:center;gap:9px}
+.brand .dot{width:9px;height:9px;border-radius:2px;background:var(--a);flex:none;
+  box-shadow:0 0 0 3px color-mix(in oklab,var(--a) 22%,transparent)}
+.brand b{font-size:14.5px;font-weight:600;letter-spacing:-.01em}
+.brand span{display:block;font:500 10px/1.4 var(--mono);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--rail-ink-2);margin-top:2px}
+
+.rlab{font:600 10px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;
+  color:var(--rail-ink-2);padding-inline:20px;margin-bottom:9px}
+.rnav{display:flex;flex-direction:column;gap:1px}
+.rnav button{appearance:none;border:0;background:transparent;color:var(--rail-ink-2);
+  cursor:pointer;font:500 13.5px/1 var(--sans);text-align:left;
+  padding:10px 20px;display:flex;align-items:center;gap:10px;
+  border-left:2px solid transparent}
+.rnav button:hover{color:var(--rail-ink)}
+.rnav button[aria-selected="true"]{color:var(--rail-ink);background:var(--rail-2);
+  border-left-color:var(--sel)}
+.rnav button:focus-visible{outline:2px solid var(--d);outline-offset:-2px}
+.rnav i{width:14px;height:14px;flex:none;opacity:.85}
+@media(max-width:920px){
+  .rnav{flex-direction:row;overflow-x:auto;gap:0}
+  .rnav button{border-left:0;border-bottom:2px solid transparent;white-space:nowrap;padding:12px 16px}
+  .rnav button[aria-selected="true"]{border-bottom-color:var(--sel);background:transparent}
+}
+.rseg{display:flex;gap:2px;background:var(--rail-2);border-radius:7px;padding:3px;
+  margin-inline:20px}
+.rseg button{flex:1;appearance:none;border:0;background:transparent;color:var(--rail-ink-2);
+  font:500 12px/1 var(--sans);padding:8px 4px;border-radius:5px;cursor:pointer}
+.rseg button[aria-pressed="true"]{background:var(--rail);color:var(--rail-ink)}
+.rseg button:focus-visible{outline:2px solid var(--d);outline-offset:1px}
+.rmeta{margin-top:auto;padding-inline:20px;font:400 11px/1.6 var(--mono);
+  color:var(--rail-ink-2)}
+.rmeta div{display:flex;justify-content:space-between;gap:8px}
+@media(max-width:920px){.rmeta{display:none}}
+
+/* ── main ──────────────────────────────────────────────────────────────── */
+main{min-width:0;padding:24px 28px 56px}
+@media(max-width:600px){main{padding:18px 16px 40px}}
+.head{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:baseline;
+  justify-content:space-between;margin-bottom:20px}
+.head h1{margin:0;font-size:21px;font-weight:600;letter-spacing:-.02em}
+.head p{margin:4px 0 0;font-size:12.5px;color:var(--ink-2);max-width:78ch}
+.chip{font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-2);background:var(--panel);border:1px solid var(--line);
+  border-radius:99px;padding:6px 11px;white-space:nowrap}
+
+.g{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.c12{grid-column:span 12}.c8{grid-column:span 8}.c7{grid-column:span 7}
+.c6{grid-column:span 6}.c5{grid-column:span 5}.c4{grid-column:span 4}
+@media(max-width:1080px){.c8,.c7,.c6,.c5,.c4{grid-column:span 12}}
+
+.p{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+  box-shadow:var(--sh);display:flex;flex-direction:column}
+.p>.ph{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+  padding:14px 18px;border-bottom:1px solid var(--line-2)}
+.p>.ph h2{margin:0;font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+.p>.ph .sub{margin:3px 0 0;font-size:11.5px;color:var(--ink-3);font-weight:400}
+.p>.ph .rt{font:500 11px/1 var(--mono);color:var(--ink-3);white-space:nowrap}
+.p>.pb{padding:18px}
+.p>.pb.flush{padding:0}
+.note{font-size:11.5px;color:var(--ink-3);line-height:1.55;margin:14px 0 0;max-width:80ch}
+
+/* ── stat band ─────────────────────────────────────────────────────────── */
+.band{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:9px;overflow:hidden;box-shadow:var(--sh)}
+@media(max-width:1080px){.band{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.band{grid-template-columns:repeat(2,1fr)}}
+.band .s{background:var(--panel);padding:15px 16px 16px}
+.band .k{font:600 10px/1.3 var(--mono);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3)}
+.band .v{font-family:var(--mono);font-size:23px;font-weight:600;letter-spacing:-.02em;
+  margin-top:7px;font-variant-numeric:tabular-nums;line-height:1.1}
+.band .d{font:400 11.5px/1.4 var(--mono);margin-top:4px;color:var(--ink-3)}
+
+/* compact stat list inside a panel */
+.kv{display:flex;flex-direction:column}
+.kv div{display:flex;justify-content:space-between;gap:16px;padding:9px 0;
+  border-bottom:1px solid var(--line-2);font-size:12.5px}
+.kv div:last-child{border-bottom:0}
+.kv span:first-child{color:var(--ink-2)}
+.kv span:last-child{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+
+/* ── charts ────────────────────────────────────────────────────────────── */
 svg{display:block;width:100%;height:auto;overflow:visible}
-.gl{stroke:var(--line-soft);stroke-width:1}
+.gl{stroke:var(--line-2);stroke-width:1}
 .ax{fill:var(--ink-3);font-family:var(--mono);font-size:10px}
-.zero{stroke:var(--ink-3);stroke-width:1;opacity:.5}
-.dlabel{font-family:var(--mono);font-size:10.5px;font-weight:600}
-.legend{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 12px;padding:0;list-style:none;
-  font-size:12px;color:var(--ink-2)}
-.legend li{display:flex;align-items:center;gap:7px}
-.sw{width:15px;height:3px;border-radius:2px;flex:none}
+.zero{stroke:var(--ink-4);stroke-width:1}
+.dl{font-family:var(--mono);font-size:10.5px;font-weight:600}
+.lg{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 14px;padding:0;list-style:none;
+  font-size:11.5px;color:var(--ink-2)}
+.lg li{display:flex;align-items:center;gap:7px}
+.sw{width:14px;height:3px;border-radius:2px;flex:none}
+.sw.b{height:10px;border-radius:2px}
 .sw.dash{background:repeating-linear-gradient(90deg,var(--alone) 0 5px,transparent 5px 9px)}
-figcaption{margin-top:11px;font-size:11.5px;color:var(--ink-3);line-height:1.5}
 
-/* tooltip */
-.tip{position:fixed;pointer-events:none;z-index:60;background:var(--panel);
-  border:1px solid var(--line);border-radius:7px;padding:8px 10px;box-shadow:var(--shadow);
-  font-size:12px;opacity:0;transition:opacity .09s;min-width:130px}
+.tip{position:fixed;pointer-events:none;z-index:70;background:var(--rail);
+  color:var(--rail-ink);border-radius:7px;padding:9px 11px;box-shadow:0 6px 20px rgba(0,0,0,.28);
+  font-size:11.5px;opacity:0;transition:opacity .08s;min-width:146px}
 .tip[data-on="1"]{opacity:1}
-.tip b{display:block;font-size:11px;color:var(--ink-3);font-family:var(--mono);
-  font-weight:600;letter-spacing:.04em;margin-bottom:4px}
-.tip .r{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);
-  font-variant-numeric:tabular-nums}
-.tip .r span:first-child{color:var(--ink-2)}
+.tip b{display:block;font:600 10px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--rail-ink-2);margin-bottom:7px}
+.tip .r{display:flex;justify-content:space-between;gap:16px;font-family:var(--mono);
+  font-variant-numeric:tabular-nums;padding:1px 0}
+.tip .r span:first-child{color:var(--rail-ink-2)}
 
-/* tables */
-.tscroll{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:520px}
-th,td{padding:8px 11px;text-align:right;border-bottom:1px solid var(--line-soft);white-space:nowrap}
-th{background:var(--panel-2);font-weight:600;font-size:10.5px;letter-spacing:.05em;
-  text-transform:uppercase;color:var(--ink-3);font-family:var(--mono);position:sticky;top:0}
+/* ── tables ────────────────────────────────────────────────────────────── */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:560px}
+th,td{padding:9px 14px;text-align:right;border-bottom:1px solid var(--line-2);white-space:nowrap}
+th{position:sticky;top:0;background:var(--sunk);z-index:1;
+  font:600 10px/1.3 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
 th:first-child,td:first-child{text-align:left}
 tbody tr:last-child td{border-bottom:0}
-tbody tr.tot td{font-weight:600;background:var(--panel-2)}
+tbody tr.hi td{background:var(--sunk);font-weight:600}
+tbody tr.sep td{border-top:1px solid var(--line)}
 td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+td .tag{font:600 9.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 6px;border-radius:4px;background:var(--sunk);color:var(--ink-3)}
 
-/* heatmap */
-.hm{display:grid;grid-template-columns:44px repeat(12,1fr);gap:2px;min-width:620px}
+/* ── heatmap ───────────────────────────────────────────────────────────── */
+.hmw{overflow-x:auto}
+.hm{display:grid;grid-template-columns:44px repeat(12,1fr);gap:2px;min-width:640px}
 .hm div{font-family:var(--mono);font-size:10.5px;font-variant-numeric:tabular-nums;
-  display:flex;align-items:center;justify-content:center;border-radius:3px;height:30px}
+  display:flex;align-items:center;justify-content:center;border-radius:3px;height:32px}
 .hm .hh{color:var(--ink-3);font-weight:600;height:20px}
-.hm .yr{color:var(--ink-2);font-weight:600;justify-content:flex-end;padding-right:7px}
-.hm .cell{cursor:default}
-.hmwrap{overflow-x:auto}
-
-/* regime bars */
-.rgrid{display:grid;grid-template-columns:84px 1fr 96px;gap:9px 12px;align-items:center;
-  font-size:12.5px}
-.rbar{height:19px;border-radius:0 3px 3px 0;position:relative}
-.rname{color:var(--ink-2);font-weight:500}
-.rval{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
-
-.note{border-left:2px solid var(--warn);padding:10px 0 10px 13px;margin-top:16px;
-  font-size:12.5px;color:var(--ink-2);line-height:1.6}
-.note strong{color:var(--ink);font-weight:600}
+.hm .yr{color:var(--ink-2);font-weight:600;justify-content:flex-end;padding-right:8px}
+.scale{display:flex;align-items:center;gap:8px;margin-top:14px;font:500 10.5px var(--mono);
+  color:var(--ink-3)}
+.scale .ramp{height:8px;flex:1;max-width:220px;border-radius:2px;
+  background:linear-gradient(90deg,var(--neg),var(--sunk),var(--pos))}
 [hidden]{display:none!important}
-@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 
-<header>
-  <div class="hrow">
-    <div class="brand">
-      <div class="eyebrow">NIFTY equity replica + conditioned call</div>
-      <h1>Overlay Desk</h1>
-      <p>Backtest on a fixed ₹1 crore, profit booked out monthly, nothing compounded.
-         Feb 2021 – Sep 2026 · 68 months · 292 option cycles.</p>
+<div class="app">
+  <aside class="rail">
+    <div class="pad brand">
+      <span class="dot"></span>
+      <div><b>Overlay Desk</b><span id="brandSub">Model A</span></div>
     </div>
-    <div class="seg" role="group" aria-label="Select book">
-      <button data-book="A" aria-pressed="true">Model A</button>
-      <button data-book="D" aria-pressed="false">Model D</button>
-      <button data-book="C" aria-pressed="false">Compare</button>
-    </div>
-  </div>
-  <nav role="tablist">
-    <button role="tab" data-tab="ov" aria-selected="true">Overview</button>
-    <button role="tab" data-tab="pnl" aria-selected="false">P&amp;L history</button>
-    <button role="tab" data-tab="eng" aria-selected="false">Option engine</button>
-  </nav>
-</header>
 
-<div class="wrap">
-  <div class="kpis" id="kpis"></div>
-
-  <!-- OVERVIEW -->
-  <section id="ov" class="stack" style="margin-top:18px">
-    <figure class="panel" style="margin:0">
-      <h2>Cumulative profit on ₹1 crore</h2>
-      <p class="sub" id="curveSub"></p>
-      <ul class="legend" id="curveLeg"></ul>
-      <div id="curve"></div>
-      <figcaption>Profit booked out each month, so the line is cumulative rupees withdrawn
-        as a percentage of the ₹1 crore deployed — not a compounding NAV.</figcaption>
-    </figure>
-
-    <figure class="panel" style="margin:0">
-      <h2>Underwater — distance below the previous peak</h2>
-      <p class="sub">Drawdown on the cumulative booked-profit curve, as a % of ₹1 crore.</p>
-      <div id="uw"></div>
-      <figcaption>Every drawdown in the record recovers. The overlay's job is to make
-        these shallower, not to remove them.</figcaption>
-    </figure>
-
-    <div class="panel">
-      <h2>All four books, same mandate</h2>
-      <p class="sub">The overlay adds return and cuts drawdown on both books.</p>
-      <div class="tscroll">
-        <table id="cmp"><thead><tr>
-          <th>Book</th><th>Return /yr</th><th>Max DD</th><th>Vol</th>
-          <th>Sharpe</th><th>CAR/MDD</th><th>Worst mo.</th><th>Win mo.</th><th>Profit ₹</th>
-        </tr></thead><tbody></tbody></table>
+    <div>
+      <div class="rlab">Book</div>
+      <div class="rseg" role="group" aria-label="Select book">
+        <button data-book="A" aria-pressed="true">Model A</button>
+        <button data-book="D" aria-pressed="false">Model D</button>
+        <button data-book="C" aria-pressed="false">Both</button>
       </div>
     </div>
-  </section>
 
-  <!-- PNL -->
-  <section id="pnl" class="stack" style="margin-top:18px" hidden>
-    <figure class="panel" style="margin:0">
-      <h2>Year by year — where the money came from</h2>
-      <p class="sub" id="yrSub"></p>
-      <ul class="legend">
-        <li><span class="sw" style="background:var(--bk);height:11px;border-radius:3px"></span>Equity book</li>
-        <li><span class="sw" style="background:var(--ink-3);height:11px;border-radius:3px"></span>Option overlay</li>
-      </ul>
-      <div id="yr"></div>
-      <figcaption>The overlay runs counter-cyclical to the book: biggest in the equity
-        book's weakest years, smallest or negative in its strongest.</figcaption>
-    </figure>
-
-    <div class="panel">
-      <h2>Monthly return on ₹1 crore</h2>
-      <p class="sub">Each cell is that month's total P&amp;L — equity plus overlay — as a
-        percentage of the ₹1 crore. Blue is profit, red is loss.</p>
-      <div class="hmwrap"><div class="hm" id="hm"></div></div>
-      <figcaption>Colour is a diverging blue↔red scale rather than green/red so it stays
-        readable for colour-blind viewers; every cell prints its own number, so the value
-        never depends on the colour.</figcaption>
-    </div>
-
-    <div class="panel">
-      <h2>Yearly ledger</h2>
-      <p class="sub">Equity and overlay contribution in rupees, booked out monthly.</p>
-      <div class="tscroll">
-        <table id="yrtab"><thead><tr>
-          <th>Year</th><th>Equity ₹</th><th>Overlay ₹</th><th>Total ₹</th><th>On ₹1 Cr</th>
-        </tr></thead><tbody></tbody></table>
+    <div>
+      <div class="rlab">Views</div>
+      <div class="rnav" role="tablist">
+        <button role="tab" data-v="ov" aria-selected="true"><i>◧</i>Overview</button>
+        <button role="tab" data-v="pf" aria-selected="false"><i>▤</i>Performance</button>
+        <button role="tab" data-v="rk" aria-selected="false"><i>◣</i>Risk</button>
+        <button role="tab" data-v="en" aria-selected="false"><i>◈</i>Option engine</button>
+        <button role="tab" data-v="tr" aria-selected="false"><i>≡</i>Trade log</button>
       </div>
     </div>
-  </section>
 
-  <!-- ENGINE -->
-  <section id="eng" class="stack" style="margin-top:18px" hidden>
-    <div class="panel">
-      <h2>What the strike rule does</h2>
-      <p class="sub">K = Spot − 100 + 100 × z, where z is how unusual 14-day realised
-        volatility is against its own trailing 252 sessions. Walk-forward parameters.</p>
-      <div class="tscroll">
-        <table id="rg"><thead><tr>
-          <th>Volatility read</th><th>Weeks</th><th>Strike vs spot</th>
-          <th>Premium (pts)</th><th>Avg P&amp;L ₹</th><th>Total ₹</th><th>Win %</th>
-        </tr></thead><tbody></tbody></table>
-      </div>
-      <div class="note" id="engNote"></div>
+    <div class="rmeta" id="rmeta"></div>
+  </aside>
+
+  <main>
+    <div class="head">
+      <div><h1 id="vT"></h1><p id="vS"></p></div>
+      <span class="chip" id="vC"></span>
     </div>
-
-    <figure class="panel" style="margin:0">
-      <h2>Strike distance by volatility regime</h2>
-      <p class="sub">Negative means the strike sits below spot — the hedge is on.
-        Positive means it sits above — the hedge is off.</p>
-      <div id="rgbar"></div>
-      <figcaption>The rule slides the strike monotonically from 209 points below spot in the
-        calmest weeks to 114 above in the most violent. That slide is the whole strategy.</figcaption>
-    </figure>
-  </section>
+    <div class="g" id="view"></div>
+  </main>
 </div>
 <div class="tip" id="tip" role="status" aria-live="polite"></div>
 
@@ -262,321 +234,465 @@ const D = __DATA__;
 const CAP = 1e7;
 const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const $ = s => document.querySelector(s);
-const el = (t,a={}) => Object.assign(document.createElement(t),a);
-let book = "A", tab = "ov";
+let book = "A", view = "ov";
 
-const fmtPct = v => (v>=0?"+":"") + v.toFixed(2) + "%";
-const fmtRs = v => {
-  const s = v<0?"−":"", n = Math.abs(v);
-  if (n >= 1e7) return s+"₹"+(n/1e7).toFixed(2)+" Cr";
-  if (n >= 1e5) return s+"₹"+(n/1e5).toFixed(2)+" L";
-  return s+"₹"+Math.round(n).toLocaleString("en-IN");
-};
+const pc  = v => (v>=0?"+":"") + v.toFixed(2) + "%";
+const rs  = v => { const s=v<0?"−":"", n=Math.abs(v);
+  if(n>=1e7) return s+"₹"+(n/1e7).toFixed(2)+" Cr";
+  if(n>=1e5) return s+"₹"+(n/1e5).toFixed(2)+" L";
+  return s+"₹"+Math.round(n).toLocaleString("en-IN"); };
 const hue = b => b==="D" ? "var(--d)" : "var(--a)";
+const K   = () => book==="C" ? "A" : book;
+const B   = () => D.books[K()];
 
-/* ---------- tooltip ---------- */
+/* ── tooltip ───────────────────────────────────────────────────────────── */
 const tip = $("#tip");
-function showTip(e, title, rows){
-  tip.innerHTML = "<b>"+title+"</b>" + rows.map(r =>
-    `<div class="r"><span>${r[0]}</span><span style="color:${r[2]||"var(--ink)"}">${r[1]}</span></div>`).join("");
-  tip.dataset.on = "1";
-  const w = tip.offsetWidth, h = tip.offsetHeight;
-  let x = e.clientX + 14, y = e.clientY - h - 10;
-  if (x + w > innerWidth - 8) x = e.clientX - w - 14;
-  if (y < 8) y = e.clientY + 16;
-  tip.style.left = x+"px"; tip.style.top = y+"px";
+function showTip(e,t,rows){
+  tip.innerHTML = "<b>"+t+"</b>"+rows.map(r=>
+    `<div class="r"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("");
+  tip.dataset.on="1";
+  const w=tip.offsetWidth,h=tip.offsetHeight;
+  let x=e.clientX+16,y=e.clientY-h-12;
+  if(x+w>innerWidth-8) x=e.clientX-w-16;
+  if(y<8) y=e.clientY+18;
+  tip.style.left=x+"px"; tip.style.top=y+"px";
 }
-const hideTip = () => tip.dataset.on = "0";
-addEventListener("scroll", hideTip, {passive:true});
+const hideTip=()=>tip.dataset.on="0";
+addEventListener("scroll",hideTip,{passive:true});
+function bind(node,t,rows){
+  node.addEventListener("pointerenter",e=>showTip(e,t,rows));
+  node.addEventListener("pointermove",e=>showTip(e,t,rows));
+  node.addEventListener("pointerleave",hideTip);
+}
 
-/* ---------- KPI strip ---------- */
-function kpis(){
-  const wrap = $("#kpis"); wrap.innerHTML = "";
-  const mk = (k,v,d,cls) => {
-    const c = el("div",{className:"kpi"});
-    c.append(el("div",{className:"k",textContent:k}), el("div",{className:"v",textContent:v}));
-    if (d) c.append(el("div",{className:"dlt "+(cls||""),textContent:d}));
-    wrap.append(c);
-  };
-  if (book === "C"){
-    const a = D.books.A.withcall, d = D.books.D.withcall;
-    mk("Return /yr", a["Return_pa_%"].toFixed(2)+"%", "Model D "+d["Return_pa_%"].toFixed(2)+"%");
-    mk("Max drawdown", a["Max_DD_%"].toFixed(2)+"%", "Model D "+d["Max_DD_%"].toFixed(2)+"%");
-    mk("Sharpe", a.Sharpe.toFixed(2), "Model D "+d.Sharpe.toFixed(2));
-    mk("Return per unit risk", a.CAR_MDD.toFixed(2), "Model D "+d.CAR_MDD.toFixed(2), "up");
-    mk("Win months", a["Win_Months_%"].toFixed(1)+"%", "Model D "+d["Win_Months_%"].toFixed(1)+"%");
-    mk("Total profit", fmtRs(a.Total_Profit_Rs), "Model D "+fmtRs(d.Total_Profit_Rs));
-    return;
+/* ── building blocks ───────────────────────────────────────────────────── */
+const panel = (cls,title,sub,right,body,note) => `
+  <section class="p ${cls}">
+    <div class="ph">
+      <div><h2>${title}</h2>${sub?`<p class="sub">${sub}</p>`:""}</div>
+      ${right?`<span class="rt">${right}</span>`:""}
+    </div>
+    <div class="pb${cls.includes("flush")?" flush":""}">${body}${note?`<p class="note">${note}</p>`:""}</div>
+  </section>`;
+const legend = items => `<ul class="lg">${items.map(i=>
+  `<li><span class="sw ${i.bar?"b":""} ${i.dash?"dash":""}" style="${i.dash?"":"background:"+i.c}"></span>${i.t}</li>`).join("")}</ul>`;
+const nice = x => { const p=Math.pow(10,Math.floor(Math.log10(Math.abs(x)||1))),n=x/p;
+  return (n<=1?1:n<=2?2:n<=5?5:10)*p; };
+
+/* line / area chart -------------------------------------------------- */
+function line(node,series,o){
+  const W=960,H=o.h||280,P={t:14,r:o.r??62,b:26,l:o.l??48};
+  const n=series[0].v.length;
+  let lo=Infinity,hi=-Infinity;
+  series.forEach(s=>s.v.forEach(v=>{ if(v==null)return; lo=Math.min(lo,v);hi=Math.max(hi,v); }));
+  lo=Math.min(lo,0);hi=Math.max(hi,0);
+  const pad=(hi-lo)*.08||1; lo-=pad; hi+=pad;
+  const X=i=>P.l+i*(W-P.l-P.r)/(n-1), Y=v=>P.t+(hi-v)*(H-P.t-P.b)/(hi-lo);
+  const st=nice((hi-lo)/4); let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.aria}">`;
+  for(let t=Math.ceil(lo/st)*st;t<=hi;t+=st){
+    s+=`<line class="gl" x1="${P.l}" y1="${Y(t)}" x2="${W-P.r}" y2="${Y(t)}"/>`;
+    s+=`<text class="ax" x="${P.l-9}" y="${Y(t)+3.5}" text-anchor="end">${t.toFixed(0)}${o.unit||"%"}</text>`;
   }
-  const b = D.books[book], w = b.withcall, o = b.alone;
-  const dd = (x,y,inv) => {
-    const v = x - y, s = (v>=0?"+":"")+v.toFixed(2);
-    return [s+" vs alone", (inv ? v<0 : v>0) ? "up":"dn"];
-  };
-  let t;
-  t = dd(w["Return_pa_%"], o["Return_pa_%"]);      mk("Return /yr", w["Return_pa_%"].toFixed(2)+"%", t[0], t[1]);
-  t = dd(w["Max_DD_%"], o["Max_DD_%"]);            mk("Max drawdown", w["Max_DD_%"].toFixed(2)+"%", t[0]+" pp", "up");
-  t = dd(w.Sharpe, o.Sharpe);                      mk("Sharpe", w.Sharpe.toFixed(2), t[0], t[1]);
-  t = dd(w["Vol_%"], o["Vol_%"]);                  mk("Volatility", w["Vol_%"].toFixed(2)+"%", t[0]+" pp", "up");
-  t = dd(w["Worst_Month_%"], o["Worst_Month_%"]);  mk("Worst month", w["Worst_Month_%"].toFixed(2)+"%", t[0]+" pp", "up");
-  mk("Total profit", fmtRs(w.Total_Profit_Rs), "+"+fmtRs(w.Total_Profit_Rs-o.Total_Profit_Rs)+" from overlay", "up");
-}
-
-/* ---------- line chart ---------- */
-function lineChart(node, series, opts){
-  const W=900, H=opts.h||280, P={t:14,r:60,b:26,l:46};
-  const pts = series[0].v.length;
-  let lo=Infinity, hi=-Infinity;
-  series.forEach(s => s.v.forEach(v => { lo=Math.min(lo,v); hi=Math.max(hi,v); }));
-  if (opts.zeroBase) { lo = Math.min(lo,0); hi = Math.max(hi,0); }
-  const pad = (hi-lo)*0.08 || 1; lo-=pad; hi+=pad;
-  const X = i => P.l + i*(W-P.l-P.r)/(pts-1);
-  const Y = v => P.t + (hi-v)*(H-P.t-P.b)/(hi-lo);
-
-  const ticks=[]; const step=niceStep((hi-lo)/4);
-  for(let t=Math.ceil(lo/step)*step; t<=hi; t+=step) ticks.push(+t.toFixed(6));
-
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${opts.aria}">`;
-  ticks.forEach(t => {
-    s += `<line class="gl" x1="${P.l}" y1="${Y(t)}" x2="${W-P.r}" y2="${Y(t)}"/>`;
-    s += `<text class="ax" x="${P.l-8}" y="${Y(t)+3.5}" text-anchor="end">${t.toFixed(0)}%</text>`;
-  });
-  if (lo<0 && hi>0) s += `<line class="zero" x1="${P.l}" y1="${Y(0)}" x2="${W-P.r}" y2="${Y(0)}"/>`;
-
-  const labs = opts.labels;
-  labs.forEach((L,i) => { if(L) s += `<text class="ax" x="${X(i)}" y="${H-8}" text-anchor="middle">${L}</text>`; });
-
-  series.forEach(se => {
-    if (se.fill){
-      let d = `M${X(0)},${Y(0)}`;
-      se.v.forEach((v,i)=> d += `L${X(i)},${Y(v)}`);
-      d += `L${X(pts-1)},${Y(0)}Z`;
-      s += `<path d="${d}" fill="${se.color}" fill-opacity=".16" stroke="none"/>`;
+  if(lo<0&&hi>0) s+=`<line class="zero" x1="${P.l}" y1="${Y(0)}" x2="${W-P.r}" y2="${Y(0)}"/>`;
+  o.labels.forEach((L,i)=>{ if(L) s+=`<text class="ax" x="${X(i)}" y="${H-7}" text-anchor="middle">${L}</text>`; });
+  series.forEach(se=>{
+    const pts=se.v.map((v,i)=>[i,v]).filter(p=>p[1]!=null);
+    if(!pts.length) return;
+    if(se.fill){
+      let d=`M${X(pts[0][0])},${Y(0)}`;
+      pts.forEach(([i,v])=>d+=`L${X(i)},${Y(v)}`);
+      d+=`L${X(pts[pts.length-1][0])},${Y(0)}Z`;
+      s+=`<path d="${d}" fill="${se.c}" fill-opacity=".13" stroke="none"/>`;
     }
-    let d = "";
-    se.v.forEach((v,i)=> d += (i?"L":"M")+X(i)+","+Y(v));
-    s += `<path d="${d}" fill="none" stroke="${se.color}" stroke-width="2"
-           stroke-linejoin="round" stroke-linecap="round"${se.dash?' stroke-dasharray="5 4"':''}/>`;
-    const last = se.v[pts-1];
-    s += `<circle cx="${X(pts-1)}" cy="${Y(last)}" r="3.5" fill="${se.color}"
-           stroke="var(--panel)" stroke-width="2"/>`;
-    s += `<text class="dlabel" x="${X(pts-1)+8}" y="${Y(last)+3.5}" fill="${se.color}">${last.toFixed(1)}%</text>`;
+    let d=""; pts.forEach(([i,v],j)=>d+=(j?"L":"M")+X(i)+","+Y(v));
+    s+=`<path d="${d}" fill="none" stroke="${se.c}" stroke-width="2" stroke-linejoin="round"
+         stroke-linecap="round"${se.dash?' stroke-dasharray="5 4"':''}/>`;
+    const [li,lv]=pts[pts.length-1];
+    s+=`<circle cx="${X(li)}" cy="${Y(lv)}" r="3.5" fill="${se.c}" stroke="var(--panel)" stroke-width="2"/>`;
+    if(o.r!==0) s+=`<text class="dl" x="${X(li)+8}" y="${Y(lv)+3.5}" fill="${se.c}">${lv.toFixed(1)}${o.unit||"%"}</text>`;
   });
-  s += `<line id="ch" x1="0" y1="${P.t}" x2="0" y2="${H-P.b}" stroke="var(--ink-3)"
-         stroke-width="1" opacity="0"/>`;
-  s += `<rect x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="transparent"/>`;
-  s += `</svg>`;
-  node.innerHTML = s;
-
-  const svg = node.querySelector("svg"), ch = svg.querySelector("#ch");
-  svg.addEventListener("pointermove", e => {
-    const r = svg.getBoundingClientRect();
-    const px = (e.clientX-r.left)/r.width*W;
-    let i = Math.round((px-P.l)/((W-P.l-P.r)/(pts-1)));
-    i = Math.max(0,Math.min(pts-1,i));
-    ch.setAttribute("x1",X(i)); ch.setAttribute("x2",X(i)); ch.setAttribute("opacity",".45");
-    showTip(e, opts.tipTitle(i), series.map(se => [se.name, fmtPct(se.v[i]), se.color]));
+  s+=`<line id="ch" x1="0" y1="${P.t}" x2="0" y2="${H-P.b}" stroke="var(--ink-4)" stroke-width="1" opacity="0"/>`;
+  s+=`<rect x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="transparent"/></svg>`;
+  node.innerHTML=s;
+  const svg=node.querySelector("svg"),ch=svg.querySelector("#ch");
+  svg.addEventListener("pointermove",e=>{
+    const r=svg.getBoundingClientRect();
+    let i=Math.round(((e.clientX-r.left)/r.width*W-P.l)/((W-P.l-P.r)/(n-1)));
+    i=Math.max(0,Math.min(n-1,i));
+    ch.setAttribute("x1",X(i));ch.setAttribute("x2",X(i));ch.setAttribute("opacity",".45");
+    showTip(e,o.tip(i),series.filter(se=>se.v[i]!=null).map(se=>[se.n,pc(se.v[i])]));
   });
-  svg.addEventListener("pointerleave", ()=>{ ch.setAttribute("opacity","0"); hideTip(); });
-}
-function niceStep(x){
-  const p = Math.pow(10, Math.floor(Math.log10(Math.abs(x)||1)));
-  const n = x/p;
-  return (n<=1?1:n<=2?2:n<=5?5:10)*p;
+  svg.addEventListener("pointerleave",()=>{ch.setAttribute("opacity","0");hideTip();});
 }
 
-/* ---------- overview ---------- */
-function overview(){
-  const mkLabels = arr => arr.map((c,i)=> c.d.slice(5)==="01" || i===0 ? c.d.slice(0,4) : "");
-  let series, sub;
-  if (book === "C"){
-    series = [
-      {name:"Model A + call", v:D.books.A.curve.map(c=>c.p), color:"var(--a)"},
-      {name:"Model D + call", v:D.books.D.curve.map(c=>c.p), color:"var(--d)"}];
-    sub = "Both books with the conditioned call overlay.";
-  } else {
-    const b = D.books[book];
-    series = [
-      {name:D.books[book].label+" only", v:b.curve.map(c=>c.p*0), color:"var(--alone)", dash:true},
-      {name:D.books[book].label+" + call", v:b.curve.map(c=>c.p), color:hue(book), fill:true}];
-    // rebuild "alone" curve from its own monthly totals minus the option leg
-    let run=0; series[0].v = b.monthly.map(m => { run += (m.tot-m.op); return +(run/CAP*100).toFixed(2); });
-    sub = D.books[book].label+" on its own against the same book with the weekly call written against it.";
+/* grouped / simple bars ----------------------------------------------- */
+function bars(node,rows,o){
+  const W=960,H=o.h||250,P={t:16,r:14,b:o.b||40,l:o.l||56};
+  let lo=0,hi=0;
+  rows.forEach(r=>r.v.forEach(v=>{lo=Math.min(lo,v);hi=Math.max(hi,v);}));
+  const pad=(hi-lo)*.14||1; lo-=pad; hi+=pad;
+  const Y=v=>P.t+(hi-v)*(H-P.t-P.b)/(hi-lo);
+  const bw=(W-P.l-P.r)/rows.length, k=rows[0].v.length;
+  const gw=Math.min(bw*0.66/k, 42);
+  const st=nice((hi-lo)/4); let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.aria}">`;
+  for(let t=Math.ceil(lo/st)*st;t<=hi;t+=st){
+    s+=`<line class="gl" x1="${P.l}" y1="${Y(t)}" x2="${W-P.r}" y2="${Y(t)}"/>`;
+    s+=`<text class="ax" x="${P.l-9}" y="${Y(t)+3.5}" text-anchor="end">${o.fmtAx(t)}</text>`;
   }
-  $("#curveSub").textContent = sub;
-  $("#curveLeg").innerHTML = series.map(s =>
-    `<li><span class="sw${s.dash?" dash":""}" style="background:${s.dash?"":s.color}"></span>${s.name}</li>`).join("");
-  const cur = D.books[book==="C"?"A":book].curve;
-  lineChart($("#curve"), series, {labels:mkLabels(cur), zeroBase:true, aria:"Cumulative profit curve",
-    tipTitle:i=>cur[i].d});
+  s+=`<line class="zero" x1="${P.l}" y1="${Y(0)}" x2="${W-P.r}" y2="${Y(0)}"/>`;
+  rows.forEach((r,i)=>{
+    const cx=P.l+i*bw+bw/2, span=gw*k+(k-1)*2;
+    r.v.forEach((v,j)=>{
+      const x=cx-span/2+j*(gw+2), h=Math.abs(Y(v)-Y(0));
+      s+=`<rect data-i="${i}" x="${x}" y="${v>=0?Y(v):Y(0)}" width="${gw}"
+           height="${Math.max(h,1)}" rx="3" fill="${o.colors[j]}"/>`;
+    });
+    s+=`<text class="ax" x="${cx}" y="${H-(o.sub?22:8)}" text-anchor="middle">${r.k}</text>`;
+    if(o.sub) s+=`<text class="dl" x="${cx}" y="${H-6}" text-anchor="middle"
+       fill="${o.sub(r)[1]}">${o.sub(r)[0]}</text>`;
+  });
+  s+=`</svg>`; node.innerHTML=s;
+  node.querySelectorAll("rect[data-i]").forEach(el=>{
+    const r=rows[+el.dataset.i]; bind(el,r.t,r.rows);
+  });
+}
 
-  const uw = book==="C"
-    ? [{name:"Model A + call", v:D.books.A.curve.map(c=>c.dd), color:"var(--a)", fill:true},
-       {name:"Model D + call", v:D.books.D.curve.map(c=>c.dd), color:"var(--d)", fill:true}]
-    : [{name:D.books[book].label+" + call", v:D.books[book].curve.map(c=>c.dd), color:hue(book), fill:true}];
-  lineChart($("#uw"), uw, {h:190, labels:mkLabels(cur), zeroBase:true, aria:"Underwater drawdown curve",
-    tipTitle:i=>cur[i].d});
+/* horizontal bars ------------------------------------------------------ */
+function hbars(node,rows,o){
+  const W=960,H=o.h||210,P={t:10,r:20,b:24,l:o.l||104};
+  const vals=rows.map(r=>r.v);
+  const lo=Math.min(...vals,0)*1.15, hi=Math.max(...vals,0)*1.45;
+  const X=v=>P.l+(v-lo)*(W-P.l-P.r)/(hi-lo), rh=(H-P.t-P.b)/rows.length;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.aria}">`;
+  s+=`<line class="zero" x1="${X(0)}" y1="${P.t}" x2="${X(0)}" y2="${H-P.b}"/>`;
+  rows.forEach((r,i)=>{
+    const y=P.t+i*rh+4,h=rh-9;
+    const x0=r.v<0?X(r.v):X(0), w=Math.abs(X(r.v)-X(0));
+    s+=`<rect data-i="${i}" x="${x0}" y="${y}" width="${Math.max(w,2)}" height="${h}" rx="3" fill="${r.c}"/>`;
+    s+=`<text class="ax" x="${P.l-10}" y="${y+h/2+3.5}" text-anchor="end"
+         style="font-family:var(--sans);font-size:12px;fill:var(--ink-2)">${r.k}</text>`;
+    const lx=r.v<0?x0-7:x0+w+7;
+    s+=`<text class="dl" x="${lx}" y="${y+h/2+3.5}" text-anchor="${r.v<0?"end":"start"}"
+         fill="var(--ink-2)">${o.fmt(r.v)}</text>`;
+    if(r.side) s+=`<text class="ax" x="${X(0)+(r.v<0?7:-7)}" y="${y+h/2+3.5}"
+         text-anchor="${r.v<0?"start":"end"}">${r.side}</text>`;
+  });
+  if(o.axis) s+=`<text class="ax" x="${X(0)}" y="${H-8}" text-anchor="middle">${o.axis}</text>`;
+  s+=`</svg>`; node.innerHTML=s;
+  node.querySelectorAll("rect[data-i]").forEach(el=>{
+    const r=rows[+el.dataset.i]; if(r.rows) bind(el,r.t||r.k,r.rows);
+  });
+}
 
-  const rows = [["A","alone"],["A","withcall"],["D","alone"],["D","withcall"]];
-  $("#cmp tbody").innerHTML = rows.map(([k,w])=>{
-    const s = D.books[k][w], on = w==="withcall";
-    return `<tr${on?' class="tot"':''}><td>${s.Book}</td>
-      <td class="n">${s["Return_pa_%"].toFixed(2)}%</td>
-      <td class="n">${s["Max_DD_%"].toFixed(2)}%</td>
-      <td class="n">${s["Vol_%"].toFixed(2)}%</td>
-      <td class="n">${s.Sharpe.toFixed(2)}</td>
-      <td class="n">${s.CAR_MDD.toFixed(2)}</td>
+/* ── views ─────────────────────────────────────────────────────────────── */
+const META = () => {
+  const m=D.meta;
+  return `<div><span>window</span><span>${m.from.slice(0,7)} → ${m.to.slice(0,7)}</span></div>
+          <div><span>months</span><span>${m.months}</span></div>
+          <div><span>cycles</span><span>${m.cycles}</span></div>
+          <div><span>avg lots</span><span>${m.avgLots}</span></div>
+          <div><span>coverage</span><span>${m.avgCover}%</span></div>`;
+};
+
+function statBand(){
+  const cells=[];
+  if(book==="C"){
+    const a=D.books.A.withcall,d=D.books.D.withcall;
+    const p=f=>[f(a),"Model D "+f(d)];
+    cells.push(["Return /yr",...p(x=>x["Return_pa_%"].toFixed(2)+"%")]);
+    cells.push(["Max drawdown",...p(x=>x["Max_DD_%"].toFixed(2)+"%")]);
+    cells.push(["Volatility",...p(x=>x["Vol_%"].toFixed(2)+"%")]);
+    cells.push(["Sharpe",...p(x=>x.Sharpe.toFixed(2))]);
+    cells.push(["CAR / MDD",...p(x=>x.CAR_MDD.toFixed(2))]);
+    cells.push(["Win months",...p(x=>x["Win_Months_%"].toFixed(1)+"%")]);
+  } else {
+    const b=B(),c=b.withcall,o=b.alone;
+    const dl=(x,y,inv)=>{const v=x-y;return [`${v>=0?"+":""}${v.toFixed(2)} vs alone`,(inv?v<0:v>0)?"up":"dn"];};
+    const add=(k,v,d)=>cells.push([k,v,d[0],d[1]]);
+    add("Return /yr",c["Return_pa_%"].toFixed(2)+"%",dl(c["Return_pa_%"],o["Return_pa_%"]));
+    add("Max drawdown",c["Max_DD_%"].toFixed(2)+"%",[dl(c["Max_DD_%"],o["Max_DD_%"])[0],"up"]);
+    add("Volatility",c["Vol_%"].toFixed(2)+"%",[dl(c["Vol_%"],o["Vol_%"],true)[0],"up"]);
+    add("Sharpe",c.Sharpe.toFixed(2),dl(c.Sharpe,o.Sharpe));
+    add("Sortino",b.risk.call.sortino.toFixed(2),[`+${(b.risk.call.sortino-b.risk.alone.sortino).toFixed(2)} vs alone`,"up"]);
+    add("Total profit",rs(c.Total_Profit_Rs),[`+${rs(c.Total_Profit_Rs-o.Total_Profit_Rs)} overlay`,"up"]);
+  }
+  return `<div class="band c12">${cells.map(c=>
+    `<div class="s"><div class="k">${c[0]}</div><div class="v">${c[1]}</div>
+     <div class="d ${c[3]||""}">${c[2]||""}</div></div>`).join("")}</div>`;
+}
+
+const LABELS = c => c.map((x,i)=> x.d.slice(5)==="01"||i===0 ? x.d.slice(0,4) : "");
+
+function viewOverview(){
+  const b=B();
+  const cmp=[["A","alone"],["A","withcall"],["D","alone"],["D","withcall"]].map(([k,w])=>{
+    const s=D.books[k][w],r=D.books[k].risk[w==="alone"?"alone":"call"];
+    return `<tr${w==="withcall"?' class="hi"':''}><td>${s.Book}</td>
+      <td class="n">${s["Return_pa_%"].toFixed(2)}%</td><td class="n">${s["Max_DD_%"].toFixed(2)}%</td>
+      <td class="n">${s["Vol_%"].toFixed(2)}%</td><td class="n">${s.Sharpe.toFixed(2)}</td>
+      <td class="n">${r.sortino.toFixed(2)}</td><td class="n">${s.CAR_MDD.toFixed(2)}</td>
       <td class="n">${s["Worst_Month_%"].toFixed(2)}%</td>
       <td class="n">${s["Win_Months_%"].toFixed(1)}%</td>
-      <td class="n">${fmtRs(s.Total_Profit_Rs)}</td></tr>`;
-  }).join("");
+      <td class="n">${rs(s.Total_Profit_Rs)}</td></tr>`;}).join("");
+
+  const c=b.withcall,o=b.alone,rk=b.risk;
+  const at = book==="C" ? `
+    <div class="kv">
+      <div><span>Model A + call, return</span><span>${D.books.A.withcall["Return_pa_%"].toFixed(2)}%</span></div>
+      <div><span>Model D + call, return</span><span>${D.books.D.withcall["Return_pa_%"].toFixed(2)}%</span></div>
+      <div><span>Model A drawdown</span><span>${D.books.A.withcall["Max_DD_%"].toFixed(2)}%</span></div>
+      <div><span>Model D drawdown</span><span>${D.books.D.withcall["Max_DD_%"].toFixed(2)}%</span></div>
+      <div><span>Model A CAR/MDD</span><span>${D.books.A.withcall.CAR_MDD.toFixed(2)}</span></div>
+      <div><span>Model D CAR/MDD</span><span>${D.books.D.withcall.CAR_MDD.toFixed(2)}</span></div>
+      <div><span>Better per unit of risk</span><span>Model D</span></div>
+    </div>` : `
+    <div class="kv">
+      <div><span>Profit, overlay only</span><span>${rs(c.Total_Profit_Rs-o.Total_Profit_Rs)}</span></div>
+      <div><span>Return added</span><span>${pc(c["Return_pa_%"]-o["Return_pa_%"])}</span></div>
+      <div><span>Drawdown cut by</span><span>${(o["Max_DD_%"]-c["Max_DD_%"]).toFixed(2)} pp</span></div>
+      <div><span>Volatility cut by</span><span>${(o["Vol_%"]-c["Vol_%"]).toFixed(2)} pp</span></div>
+      <div><span>Time deeper than −10%</span><span>${rk.alone.deep}% → ${rk.call.deep}%</span></div>
+      <div><span>Worst month</span><span>${o["Worst_Month_%"].toFixed(2)}% → ${c["Worst_Month_%"].toFixed(2)}%</span></div>
+      <div><span>Months traded</span><span>${c.N_Months}</span></div>
+    </div>`;
+
+  return statBand()
+    + panel("c8","Cumulative profit on ₹1 crore",
+        book==="C"?"Both books carrying the overlay":"Dashed is the book alone; the gap is the overlay",
+        "% of ₹1 Cr", `<ul class="lg" id="lgCurve"></ul><div id="curve"></div>`,
+        "Profit is booked out each month, so this is cumulative rupees withdrawn — not a compounding NAV.")
+    + panel("c4","What the overlay changed","","",at)
+    + panel("c12","Underwater","Distance below the previous peak","% of ₹1 Cr",`<div id="uw"></div>`,
+        "Every drawdown recovers; the longest recovery is 305 days.")
+    + panel("c12 flush","All four books","Same ₹1 crore mandate, same window","",
+        `<div class="tw"><table><thead><tr><th>Book</th><th>Return /yr</th><th>Max DD</th>
+         <th>Vol</th><th>Sharpe</th><th>Sortino</th><th>CAR/MDD</th><th>Worst mo.</th>
+         <th>Win mo.</th><th>Profit</th></tr></thead><tbody>${cmp}</tbody></table></div>`);
 }
 
-/* ---------- P&L ---------- */
-function pnl(){
-  const b = D.books[book==="C"?"A":book];
-  document.documentElement.style.setProperty("--bk", hue(book==="C"?"A":book));
-  $("#yrSub").textContent = b.label + " — equity contribution and overlay contribution, per calendar year.";
+function viewPerf(){
+  const b=B();
+  const rows=b.yearly.map(y=>`<tr><td>${y.y}</td><td class="n">${rs(y.eq)}</td>
+    <td class="n">${rs(y.op)}</td><td class="n">${rs(y.tot)}</td>
+    <td class="n ${y.pct>=0?"up":"dn"}">${pc(y.pct)}</td></tr>`).join("");
+  const T=b.yearly.reduce((a,y)=>({eq:a.eq+y.eq,op:a.op+y.op,tot:a.tot+y.tot}),{eq:0,op:0,tot:0});
+  return panel("c7","Where the money came from","Equity leg against option leg, per year","₹",
+        legend([{t:"Equity book",c:"var(--bk)",bar:1},{t:"Option overlay",c:"var(--ink-3)",bar:1}])
+        +`<div id="yr"></div>`,
+        "The overlay runs counter-cyclical — largest in the book's weakest years.")
+    + panel("c5","Monthly return distribution","Count of months in each band","",
+        legend([{t:b.label+" + call",c:hue(K()),bar:1},{t:"Book alone",c:"var(--alone)",bar:1}])
+        +`<div id="hist"></div>`,
+        "The overlay pulls months out of the tails and into the middle.")
+    + panel("c12","Monthly return on ₹1 crore","Equity plus overlay, each month","",
+        `<div class="hmw"><div class="hm" id="hm"></div></div>
+         <div class="scale"><span>loss</span><span class="ramp"></span><span>profit</span>
+         <span style="margin-left:6px">every cell prints its own value</span></div>`)
+    + panel("c12","Rolling 12-month return","Trailing one-year total, re-struck each month","% of ₹1 Cr",
+        legend([{t:b.label+" + call",c:hue(K())},{t:"Book alone",dash:1}])
+        +`<div id="roll"></div>`,
+        "The first eleven months have no trailing year behind them, so the line starts in 2022.")
+    + panel("c12 flush","Yearly ledger","","",
+        `<div class="tw"><table><thead><tr><th>Year</th><th>Equity</th><th>Overlay</th>
+         <th>Total</th><th>On ₹1 Cr</th></tr></thead><tbody>${rows}
+         <tr class="hi sep"><td>Total</td><td class="n">${rs(T.eq)}</td><td class="n">${rs(T.op)}</td>
+         <td class="n">${rs(T.tot)}</td><td class="n">${pc(T.tot/CAP*100)}</td></tr>
+         </tbody></table></div>`);
+}
 
-  const Y = b.yearly, W=900, H=250, P={t:16,r:14,b:38,l:52};
-  let lo=0, hi=0;
-  Y.forEach(y=>{ [y.eq,y.op].forEach(v=>{lo=Math.min(lo,v);hi=Math.max(hi,v);}); });
-  const pad=(hi-lo)*.1; lo-=pad; hi+=pad;
-  const yy = v => P.t + (hi-v)*(H-P.t-P.b)/(hi-lo);
-  const bw = (W-P.l-P.r)/Y.length, gw = bw*0.32;
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Yearly P&L split">`;
-  const step = niceStep((hi-lo)/4);
-  for(let t=Math.ceil(lo/step)*step;t<=hi;t+=step){
-    s += `<line class="gl" x1="${P.l}" y1="${yy(t)}" x2="${W-P.r}" y2="${yy(t)}"/>`;
-    s += `<text class="ax" x="${P.l-8}" y="${yy(t)+3.5}" text-anchor="end">${(t/1e5).toFixed(0)}L</text>`;
+function viewRisk(){
+  const b=B(),rk=b.risk;
+  const tiles=[
+    ["Max drawdown",b.withcall["Max_DD_%"].toFixed(2)+"%",`alone ${b.alone["Max_DD_%"].toFixed(2)}%`],
+    ["Time below peak",rk.call.under+"%",`alone ${rk.alone.under}%`],
+    ["Time deeper than −10%",rk.call.deep+"%",`alone ${rk.alone.deep}%`],
+    ["Sortino",rk.call.sortino.toFixed(2),`alone ${rk.alone.sortino.toFixed(2)}`],
+    ["Worst month",b.withcall["Worst_Month_%"].toFixed(2)+"%",`alone ${b.alone["Worst_Month_%"].toFixed(2)}%`],
+    ["CAR / MDD",b.withcall.CAR_MDD.toFixed(2),`alone ${b.alone.CAR_MDD.toFixed(2)}`],
+  ];
+  const ep = w => b.eps[w].map(e=>`<tr><td class="n">${e.depth.toFixed(2)}%</td>
+      <td class="n">${e.peak}</td><td class="n">${e.trough}</td>
+      <td class="n">${e.rec||"—"}</td><td class="n">${e.days??"open"}</td></tr>`).join("");
+  return `<div class="band c12">${tiles.map(t=>
+      `<div class="s"><div class="k">${t[0]}</div><div class="v">${t[1]}</div>
+       <div class="d">${t[2]}</div></div>`).join("")}</div>`
+    + panel("c12","Drawdown, with and against the overlay","Same book, same window","% of ₹1 Cr",
+        legend([{t:b.label+" + call",c:hue(K())},{t:"Book alone",dash:1}])
+        +`<div id="ddc"></div>`,
+        "The overlay rarely changes when you are underwater — it changes how deep.")
+    + panel("c6 flush","Deepest drawdowns — with the call","","",
+        `<div class="tw"><table style="min-width:440px"><thead><tr><th>Depth</th><th>Peak</th>
+         <th>Trough</th><th>Recovered</th><th>Days</th></tr></thead>
+         <tbody>${ep("call")}</tbody></table></div>`)
+    + panel("c6 flush","Deepest drawdowns — book alone","","",
+        `<div class="tw"><table style="min-width:440px"><thead><tr><th>Depth</th><th>Peak</th>
+         <th>Trough</th><th>Recovered</th><th>Days</th></tr></thead>
+         <tbody>${ep("alone")}</tbody></table></div>`);
+}
+
+function viewEngine(){
+  const rg=D.regime.map(r=>`<tr${r.name==="Violent"?' class="hi"':''}>
+      <td>${r.name}</td><td class="n">${r.weeks}</td>
+      <td class="n">${r.money>0?"+":""}${r.money}</td><td class="n">${r.prem.toFixed(1)}</td>
+      <td class="n ${r.avg>=0?"up":"dn"}">${rs(r.avg)}</td>
+      <td class="n ${r.tot>=0?"up":"dn"}">${rs(r.tot)}</td>
+      <td class="n">${r.win.toFixed(1)}%</td></tr>`).join("");
+  const oy=D.optYear.map(y=>`<tr><td>${y.y}</td><td class="n">${y.n}</td>
+      <td class="n ${y.tot>=0?"up":"dn"}">${rs(y.tot)}</td><td class="n">${y.win}%</td></tr>`).join("");
+  const m=D.meta;
+  return panel("c12 flush","The strike rule, by volatility regime",
+        "K = Spot − 100 + 100 × z · walk-forward parameters","",
+        `<div class="tw"><table><thead><tr><th>Volatility read</th><th>Weeks</th>
+         <th>Strike vs spot</th><th>Premium</th><th>Avg P&amp;L</th><th>Total</th><th>Win %</th>
+         </tr></thead><tbody>${rg}</tbody></table></div>`)
+    + panel("c6","Strike distance against spot","Below spot the hedge is on; above, it is off","pts",
+        `<div id="slide"></div>`,
+        "The strike slides monotonically from 209 points below spot in the calmest weeks to 114 above in the most violent.")
+    + panel("c6","Option P&amp;L by regime","Total contribution from each volatility state","₹",
+        `<div id="rpnl"></div>`,
+        "Violent weeks lose money here only because the intraweek re-strike is not implemented — see below.")
+    + panel("c6 flush","Option leg, year by year","","",
+        `<div class="tw"><table style="min-width:380px"><thead><tr><th>Year</th><th>Cycles</th>
+         <th>Net</th><th>Win %</th></tr></thead><tbody>${oy}</tbody></table></div>`)
+    + panel("c6","Execution footprint","","",
+        `<div class="kv">
+          <div><span>Cycles traded</span><span>${m.cycles}</span></div>
+          <div><span>Profitable weeks</span><span>${m.optWin}%</span></div>
+          <div><span>Best / worst week</span><span>${rs(m.best)} / ${rs(m.worst)}</span></div>
+          <div><span>Average lots</span><span>${m.avgLots}</span></div>
+          <div><span>Coverage of ₹1 Cr</span><span>${m.avgCover}% avg · ${m.maxCover}% max</span></div>
+          <div><span>Average margin</span><span>${rs(m.avgMargin)} of ₹50 L pledge</span></div>
+          <div><span>Total contribution</span><span>${rs(m.optTotal)}</span></div>
+         </div>`,
+        `<strong>Known limitation.</strong> The intraweek 300-point re-strike is not implemented, and a runaway week is exactly when re-striking matters. Every overlay figure on this page is a floor, not an estimate.`);
+}
+
+function viewTrades(){
+  const t=D.trades.map(r=>`<tr><td class="n">${r.e}</td><td class="n">${r.x}</td>
+      <td class="n">${r.s.toLocaleString("en-IN")}</td>
+      <td class="n">${r.z>=0?"+":""}${r.z.toFixed(2)}</td>
+      <td class="n">${r.k.toLocaleString("en-IN")}</td>
+      <td class="n">${r.mny>0?"+":""}${r.mny}</td>
+      <td class="n">${r.lots}×${r.lot}</td>
+      <td class="n">${r.in.toFixed(2)}</td><td class="n">${r.out.toFixed(2)}</td>
+      <td class="n ${r.net>=0?"up":"dn"}">${rs(r.net)}</td></tr>`).join("");
+  return panel("c12 flush","Most recent 30 cycles",
+      "Entered Friday 15:25, closed on expiry-day 15:25 — never allowed to settle","",
+      `<div class="tw"><table style="min-width:820px"><thead><tr><th>Entry</th><th>Exit</th>
+       <th>Spot</th><th>z</th><th>Strike</th><th>vs spot</th><th>Size</th>
+       <th>Sold</th><th>Bought</th><th>Net</th></tr></thead><tbody>${t}</tbody></table></div>`);
+}
+
+/* ── charts per view ───────────────────────────────────────────────────── */
+function draw(){
+  const b=B(), lab=LABELS(b.curve), tipD=i=>b.curve[i].d;
+  if(view==="ov"){
+    const se = book==="C"
+      ? [{n:"Model A + call",v:D.books.A.curve.map(c=>c.p),c:"var(--a)"},
+         {n:"Model D + call",v:D.books.D.curve.map(c=>c.p),c:"var(--d)"}]
+      : [{n:b.label+" alone",v:b.curve.map(c=>c.a),c:"var(--alone)",dash:1},
+         {n:b.label+" + call",v:b.curve.map(c=>c.p),c:hue(K()),fill:1}];
+    $("#lgCurve").innerHTML = se.map(s=>
+      `<li><span class="sw ${s.dash?"dash":""}" style="${s.dash?"":"background:"+s.c}"></span>${s.n}</li>`).join("");
+    line($("#curve"),se,{labels:lab,aria:"Cumulative profit",tip:tipD,h:266});
+    const uw = book==="C"
+      ? [{n:"Model A + call",v:D.books.A.curve.map(c=>c.dd),c:"var(--a)",fill:1},
+         {n:"Model D + call",v:D.books.D.curve.map(c=>c.dd),c:"var(--d)",fill:1}]
+      : [{n:b.label+" alone",v:b.curve.map(c=>c.dda),c:"var(--alone)",dash:1},
+         {n:b.label+" + call",v:b.curve.map(c=>c.dd),c:hue(K()),fill:1}];
+    line($("#uw"),uw,{labels:lab,aria:"Drawdown",tip:tipD,h:190});
   }
-  s += `<line class="zero" x1="${P.l}" y1="${yy(0)}" x2="${W-P.r}" y2="${yy(0)}"/>`;
-  Y.forEach((y,i)=>{
-    const cx = P.l + i*bw + bw/2;
-    [[y.eq,"var(--bk)",-1],[y.op,"var(--ink-3)",1]].forEach(([v,col,side])=>{
-      const x = cx + (side<0 ? -gw-1 : 1);
-      const h = Math.abs(yy(v)-yy(0));
-      s += `<rect x="${x}" y="${v>=0?yy(v):yy(0)}" width="${gw}" height="${Math.max(h,1)}"
-             rx="3" fill="${col}"/>`;
-    });
-    s += `<text class="ax" x="${cx}" y="${H-20}" text-anchor="middle">${y.y}</text>`;
-    s += `<text class="dlabel" x="${cx}" y="${H-7}" text-anchor="middle"
-           fill="${y.pct>=0?"var(--good)":"var(--crit)"}">${fmtPct(y.pct)}</text>`;
-  });
-  s += `</svg>`;
-  $("#yr").innerHTML = s;
-  $("#yr").querySelectorAll("rect").forEach((r,i)=>{
-    const y = Y[Math.floor(i/2)], isEq = i%2===0;
-    r.addEventListener("pointerenter", e => showTip(e, y.y+" · "+(isEq?"Equity book":"Option overlay"),
-      [["Equity",fmtRs(y.eq)],["Overlay",fmtRs(y.op)],["Total",fmtRs(y.tot)],["On ₹1 Cr",fmtPct(y.pct)]]));
-    r.addEventListener("pointerleave", hideTip);
-  });
+  if(view==="pf"){
+    document.documentElement.style.setProperty("--bk",hue(K()));
+    bars($("#yr"),b.yearly.map(y=>({k:y.y,v:[y.eq,y.op],t:String(y.y),
+        rows:[["Equity",rs(y.eq)],["Overlay",rs(y.op)],["Total",rs(y.tot)],["On ₹1 Cr",pc(y.pct)]]})),
+      {colors:[hue(K()),"var(--ink-3)"],aria:"Yearly attribution",h:262,sub:r=>{
+        const y=b.yearly.find(x=>x.y===r.k); return [pc(y.pct),y.pct>=0?"var(--good)":"var(--crit)"];},
+       fmtAx:t=>(t/1e5).toFixed(0)+"L"});
+    const H=D.meta.hist;
+    bars($("#hist"),H.map((h,i)=>({k:h,v:[b.hist.call[i],b.hist.alone[i]],t:h,
+        rows:[["With call",b.hist.call[i]+" months"],["Alone",b.hist.alone[i]+" months"]]})),
+      {colors:[hue(K()),"var(--alone)"],aria:"Monthly distribution",h:262,l:34,b:46,
+       fmtAx:t=>t.toFixed(0)});
+    heat(b);
+    line($("#roll"),[
+      {n:b.label+" alone",v:b.roll.alone,c:"var(--alone)",dash:1},
+      {n:b.label+" + call",v:b.roll.call,c:hue(K()),fill:1}],
+      {labels:lab,aria:"Rolling 12-month return",tip:tipD,h:210});
+  }
+  if(view==="rk"){
+    line($("#ddc"),[
+      {n:b.label+" alone",v:b.curve.map(c=>c.dda),c:"var(--alone)",dash:1},
+      {n:b.label+" + call",v:b.curve.map(c=>c.dd),c:hue(K()),fill:1}],
+      {labels:lab,aria:"Drawdown comparison",tip:tipD,h:250});
+  }
+  if(view==="en"){
+    /* below spot = hedge on (book hue); above = hedge off (recessive). Not good/bad. */
+    hbars($("#slide"),D.regime.map(r=>({k:r.name,v:r.money,side:r.weeks+" wk",t:r.name,
+        c:r.money<0?hue(K()):"var(--ink-3)",
+        rows:[["Weeks",r.weeks],["Strike vs spot",(r.money>0?"+":"")+r.money+" pts"],
+              ["Premium",r.prem.toFixed(1)+" pts"],["Win rate",r.win.toFixed(1)+"%"]]})),
+      {aria:"Strike distance",fmt:v=>(v>0?"+":"")+v,axis:"spot",h:206});
+    hbars($("#rpnl"),D.regime.map(r=>({k:r.name,v:r.tot,c:r.tot>=0?hue(K()):"var(--crit)",
+        t:r.name,rows:[["Total",rs(r.tot)],["Average",rs(r.avg)],["Weeks",r.weeks],
+                       ["Win rate",r.win.toFixed(1)+"%"]]})),
+      {aria:"Option P&L by regime",fmt:v=>rs(v),h:206});
+  }
+}
 
-  // heatmap
-  const byY = {};
-  b.monthly.forEach(m=>{ const [yr,mo]=m.m.split("-"); (byY[yr]=byY[yr]||{})[+mo-1]=m; });
-  const mx = Math.max(...b.monthly.map(m=>Math.abs(m.pct)));
-  const hm = $("#hm"); hm.innerHTML = "";
-  hm.append(el("div",{className:"hh"}));
-  MON.forEach(m=>hm.append(el("div",{className:"hh",textContent:m})));
-  Object.keys(byY).sort().forEach(yr=>{
-    hm.append(el("div",{className:"yr",textContent:yr}));
+function heat(b){
+  const byY={}; b.monthly.forEach(m=>{const[y,mo]=m.m.split("-");(byY[y]=byY[y]||{})[+mo-1]=m;});
+  const mx=Math.max(...b.monthly.map(m=>Math.abs(m.pct)));
+  const hm=$("#hm"); hm.innerHTML="";
+  const cell=(cls,txt)=>{const d=document.createElement("div");d.className=cls;d.textContent=txt||"";return d;};
+  hm.append(cell("hh"));
+  MON.forEach(m=>hm.append(cell("hh",m)));
+  Object.keys(byY).sort().forEach(y=>{
+    hm.append(cell("yr",y));
     for(let i=0;i<12;i++){
-      const m = byY[yr][i];
-      const c = el("div",{className:"cell"});
-      if(!m){ c.style.background="var(--panel-2)"; c.style.opacity=".45"; }
-      else {
-        const t = Math.min(Math.abs(m.pct)/mx,1);
-        c.style.background = m.pct>=0
-          ? `color-mix(in oklab, var(--pos) ${(t*72+8).toFixed(0)}%, var(--panel))`
-          : `color-mix(in oklab, var(--neg) ${(t*72+8).toFixed(0)}%, var(--panel))`;
-        c.style.color = t>0.55 ? "#fff" : "var(--ink)";
-        c.textContent = m.pct.toFixed(1);
-        c.addEventListener("pointerenter", e=>showTip(e, MON[i]+" "+yr,
-          [["Equity",fmtRs(m.eq)],["Overlay",fmtRs(m.op)],["Total",fmtRs(m.tot)],["On ₹1 Cr",fmtPct(m.pct)]]));
-        c.addEventListener("pointerleave", hideTip);
+      const m=byY[y][i], c=cell("");
+      if(!m){ c.style.background="var(--line-2)"; }
+      else{
+        const t=Math.min(Math.abs(m.pct)/mx,1);
+        c.style.background=`color-mix(in oklab, ${m.pct>=0?"var(--pos)":"var(--neg)"} ${(t*76+8).toFixed(0)}%, var(--panel))`;
+        c.style.color = t>0.52 ? "#fff" : "var(--ink)";
+        c.textContent=m.pct.toFixed(1);
+        bind(c,MON[i]+" "+y,[["Equity",rs(m.eq)],["Overlay",rs(m.op)],
+                             ["Total",rs(m.tot)],["On ₹1 Cr",pc(m.pct)]]);
       }
       hm.append(c);
     }
   });
-
-  const tot = Y.reduce((a,y)=>({eq:a.eq+y.eq,op:a.op+y.op,tot:a.tot+y.tot}),{eq:0,op:0,tot:0});
-  $("#yrtab tbody").innerHTML = Y.map(y=>
-    `<tr><td>${y.y}</td><td class="n">${fmtRs(y.eq)}</td><td class="n">${fmtRs(y.op)}</td>
-     <td class="n">${fmtRs(y.tot)}</td>
-     <td class="n ${y.pct>=0?"up":"dn"}">${fmtPct(y.pct)}</td></tr>`).join("")
-    + `<tr class="tot"><td>Total</td><td class="n">${fmtRs(tot.eq)}</td>
-       <td class="n">${fmtRs(tot.op)}</td><td class="n">${fmtRs(tot.tot)}</td>
-       <td class="n">${fmtPct(tot.tot/CAP*100)}</td></tr>`;
 }
 
-/* ---------- engine ---------- */
-function engine(){
-  $("#rg tbody").innerHTML = D.regime.map(r=>
-    `<tr><td>${r.name}</td><td class="n">${r.weeks}</td>
-     <td class="n">${r.money>0?"+":""}${r.money}</td>
-     <td class="n">${r.prem.toFixed(1)}</td>
-     <td class="n ${r.avg>=0?"up":"dn"}">${fmtRs(r.avg)}</td>
-     <td class="n ${r.tot>=0?"up":"dn"}">${fmtRs(r.tot)}</td>
-     <td class="n">${r.win.toFixed(1)}%</td></tr>`).join("");
-
-  const m = D.meta;
-  $("#engNote").innerHTML = `<strong>Read the violent row with care.</strong>
-    The published note has violent weeks as the strategy's main earner. Here they lose money,
-    because this reconstruction does not yet implement the intraweek 300-point re-strike —
-    and a runaway week is exactly when re-striking matters. Every overlay figure on this page
-    is therefore a floor: ${fmtRs(m.optTotal)} across ${m.cycles} cycles,
-    ${m.optWin}% of them profitable, best ${fmtRs(m.best)}, worst ${fmtRs(m.worst)}.`;
-
-  const R = D.regime, W=900, H=200, P={t:10,r:16,b:28,l:96};
-  const vals = R.map(r=>r.money);
-  const lo = Math.min(...vals,0)*1.15, hi = Math.max(...vals,0)*1.35;
-  const X = v => P.l + (v-lo)*(W-P.l-P.r)/(hi-lo);
-  const rh = (H-P.t-P.b)/R.length;
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Strike distance by volatility regime">`;
-  s += `<line class="zero" x1="${X(0)}" y1="${P.t}" x2="${X(0)}" y2="${H-P.b}"/>`;
-  R.forEach((r,i)=>{
-    const y = P.t + i*rh + 4, h = rh-9;
-    const x0 = r.money<0 ? X(r.money) : X(0), w = Math.abs(X(r.money)-X(0));
-    // below spot = hedge on (book hue); above spot = hedge off (recessive grey).
-    // Not a good/bad axis - stepping the strike out in violent weeks is the intent.
-    s += `<rect x="${x0}" y="${y}" width="${Math.max(w,2)}" height="${h}" rx="3"
-           fill="${r.money<0?"var(--bk2)":"var(--ink-3)"}" fill-opacity=".85"/>`;
-    s += `<text class="ax" x="${P.l-10}" y="${y+h/2+3.5}" text-anchor="end"
-           style="font-size:11px;fill:var(--ink-2)">${r.name}</text>`;
-    const lx = r.money<0 ? x0-6 : x0+w+6;
-    s += `<text class="dlabel" x="${lx}" y="${y+h/2+3.5}"
-           text-anchor="${r.money<0?"end":"start"}" fill="var(--ink-2)">${r.money>0?"+":""}${r.money} pts</text>`;
-    s += `<text class="ax" x="${X(0)+(r.money<0?6:-6)}" y="${y+h/2+3.5}"
-           text-anchor="${r.money<0?"start":"end"}" style="fill:var(--ink-3)">${r.weeks} wk</text>`;
-  });
-  s += `<text class="ax" x="${X(0)}" y="${H-10}" text-anchor="middle">spot</text></svg>`;
-  document.documentElement.style.setProperty("--bk2", hue(book==="C"?"A":book));
-  $("#rgbar").innerHTML = s;
-}
-
-/* ---------- wiring ---------- */
+/* ── wiring ────────────────────────────────────────────────────────────── */
+const VIEWS={
+  ov:["Overview","How the book and the overlay performed together on a fixed ₹1 crore.",viewOverview],
+  pf:["Performance","Attribution, distribution and the full monthly record.",viewPerf],
+  rk:["Risk","Drawdown depth, duration and recovery — with and without the call.",viewRisk],
+  en:["Option engine","What the strike rule actually does across volatility regimes.",viewEngine],
+  tr:["Trade log","Every recent cycle, as entered and closed.",viewTrades],
+};
 function render(){
-  document.documentElement.style.setProperty("--sel", hue(book==="C"?"A":book));
-  document.documentElement.style.setProperty("--bk", hue(book==="C"?"A":book));
-  kpis();
-  if (tab==="ov") overview();
-  if (tab==="pnl") pnl();
-  if (tab==="eng") engine();
+  const sel=hue(K());
+  document.documentElement.style.setProperty("--sel",sel);
+  document.documentElement.style.setProperty("--bk",sel);
+  $("#brandSub").textContent = book==="C" ? "Model A vs D" : B().label;
+  $("#rmeta").innerHTML = META();
+  const [t,s,fn]=VIEWS[view];
+  $("#vT").textContent=t; $("#vS").textContent=s;
+  $("#vC").textContent = book==="C" ? "Model A vs Model D" : B().label+" + conditioned call";
+  $("#view").innerHTML = fn();
+  draw();
 }
-document.querySelectorAll(".seg button").forEach(b =>
-  b.addEventListener("click", ()=>{
-    book = b.dataset.book;
-    document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed", x===b));
-    render();
-  }));
-document.querySelectorAll("nav button").forEach(b =>
-  b.addEventListener("click", ()=>{
-    tab = b.dataset.tab;
-    document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected", x===b));
-    ["ov","pnl","eng"].forEach(t => $("#"+t).hidden = t!==tab);
-    render();
-  }));
-addEventListener("resize", ()=>{ hideTip(); render(); });
+document.querySelectorAll(".rseg button").forEach(el=>
+  el.addEventListener("click",()=>{ book=el.dataset.book;
+    document.querySelectorAll(".rseg button").forEach(x=>x.setAttribute("aria-pressed",x===el));
+    render(); }));
+document.querySelectorAll(".rnav button").forEach(el=>
+  el.addEventListener("click",()=>{ view=el.dataset.v;
+    document.querySelectorAll(".rnav button").forEach(x=>x.setAttribute("aria-selected",x===el));
+    render(); }));
+addEventListener("resize",()=>{hideTip();draw();});
 render();
 </script>
