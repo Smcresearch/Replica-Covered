@@ -45,6 +45,21 @@ def equity(path, cost_pa):
     return d.reset_index(drop=True)
 
 
+def benchmark(path):
+    """NIFTY 50 buy-and-hold, put through the SAME Rs 1 crore mandate.
+
+    The note quotes NIFTY as a CAGR, which is the natural convention for a
+    passive holding but is not comparable with a book that withdraws its profit
+    every month. Running the index through the identical simulate() puts every
+    curve on one basis. No cost drag: the benchmark is unlevered and uncosted.
+    """
+    d = pd.read_excel(path, sheet_name="Daily_Performance")
+    d["Date"] = pd.to_datetime(d["Date"])
+    d = d[d["Date"] >= START][["Date", "NIFTY50_Daily_Return_%"]].copy()
+    return (d.rename(columns={"NIFTY50_Daily_Return_%": "Portfolio_Daily_Return_%"})
+             .reset_index(drop=True))
+
+
 def simulate(eq, trades):
     """Rs 1 Cr deployed, month P&L booked out, option P&L landing on exit day."""
     ret = eq["Portfolio_Daily_Return_%"].values / 100.0
@@ -135,7 +150,16 @@ def main():
     print(f"option leg: {len(trades)} cycles, {trades.Entry.min()} .. "
           f"{trades.Exit.max()}  ({PARAMS} params)\n")
 
-    summary = []
+    bm = benchmark(BOOKS["Model A"])           # same series in both workbooks
+    cb, db, mb = simulate(bm, None)
+    sb = stats(bm["Date"], cb, mb, "NIFTY 50 (buy & hold)")
+    nav = (1 + bm["Portfolio_Daily_Return_%"] / 100).prod()
+    yrs = (bm["Date"].iloc[-1] - bm["Date"].iloc[0]).days / 365.25
+    sb["CAGR_%"] = round((nav ** (1 / yrs) - 1) * 100, 2)
+    print(f"benchmark: NIFTY 50 {sb['Return_pa_%']:.2f}%/yr on the mandate basis "
+          f"({sb['CAGR_%']:.2f}% CAGR buy-and-hold), DD {sb['Max_DD_%']:.2f}%\n")
+
+    summary = [sb]
     for name, path in BOOKS.items():
         eq = equity(path, COST_PA[name])
 
@@ -149,7 +173,13 @@ def main():
         out = (rf"D:\DK_sir\portfolio\Backtest_{name.replace(' ', '')}"
                rf"_CoveredCall.xlsx")
         with pd.ExcelWriter(out, engine="openpyxl") as xl:
-            pd.DataFrame([s0, s1]).to_excel(xl, sheet_name="Summary", index=False)
+            pd.DataFrame([s0, s1, sb]).to_excel(xl, sheet_name="Summary", index=False)
+            mb.assign(**{c: mb[c].round(0) for c in
+                         ("Equity_PnL", "Option_PnL", "Total_PnL")},
+                      Return_on_1Cr_pct=(mb.Return_on_1Cr * 100).round(2)) \
+              .drop(columns=["Return_on_1Cr"]) \
+              .to_excel(xl, sheet_name="Benchmark_Monthly", index=False)
+            db.to_excel(xl, sheet_name="Benchmark_Daily", index=False)
             yearly(m1).to_excel(xl, sheet_name="Yearly", index=False)
             m1.assign(**{c: m1[c].round(0) for c in
                          ("Equity_PnL", "Option_PnL", "Total_PnL")},

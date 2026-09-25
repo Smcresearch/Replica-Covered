@@ -108,6 +108,26 @@ def risk(dates, curve, monthly_pct):
     )
 
 
+def relative(book_pct, bench_pct):
+    """How a book sits against the benchmark, from monthly returns."""
+    b = np.asarray(book_pct) / 100.0
+    m = np.asarray(bench_pct) / 100.0
+    rf = RF / 12.0
+    var = m.var(ddof=1)
+    beta = float(np.cov(b, m, ddof=1)[0, 1] / var) if var else np.nan
+    alpha = float((b.mean() - rf - beta * (m.mean() - rf)) * 12)
+    up, dn = m > 0, m < 0
+    return dict(
+        corr=round(float(np.corrcoef(b, m)[0, 1]), 3),
+        beta=round(beta, 2),
+        alpha=round(alpha * 100, 2),
+        # capture: how much of the benchmark's move the book kept, by direction
+        up=round(float(b[up].mean() / m[up].mean() * 100), 1) if up.any() else None,
+        down=round(float(b[dn].mean() / m[dn].mean() * 100), 1) if dn.any() else None,
+        beat=round(float((b > m).mean() * 100), 1),
+    )
+
+
 def rolling12(monthly_pct):
     """Trailing 12-month total return, in % of the Rs 1 crore."""
     s = pd.Series(monthly_pct)
@@ -123,6 +143,26 @@ def histogram(monthly_pct):
 
 def collect():
     out = {"books": {}, "meta": {}}
+
+    # NIFTY 50 on the identical Rs 1 crore mandate, so every curve is comparable.
+    ref = os.path.join(PORT, "Backtest_ModelA_CoveredCall.xlsx")
+    bs = pd.read_excel(ref, sheet_name="Summary").iloc[2].to_dict()
+    bm = pd.read_excel(ref, sheet_name="Benchmark_Monthly")
+    bd = pd.read_excel(ref, sheet_name="Benchmark_Daily")
+    bd["Date"] = pd.to_datetime(bd["Date"])
+    bcurve = (CAPITAL + bd["Equity_PnL"].cumsum()).set_axis(bd["Date"]).resample("ME").last().dropna()
+    bpct = bm["Return_on_1Cr_pct"].tolist()
+    out["bench"] = {
+        "label": "NIFTY 50",
+        "summary": bs,
+        "monthly": bpct,
+        "curve": [round(float(v), 2) for v in (bcurve - CAPITAL) / CAPITAL * 100],
+        "dd": [round(float(v), 2) for v in (bcurve - bcurve.cummax()) / CAPITAL * 100],
+        "roll": rolling12(bpct),
+        "hist": histogram(bpct),
+        "risk": risk(bd["Date"], (CAPITAL + bd["Equity_PnL"].cumsum()).values, bpct),
+    }
+
     for key, fname, label in BOOKS:
         f = os.path.join(PORT, f"Backtest_{fname}_CoveredCall.xlsx")
         s = pd.read_excel(f, sheet_name="Summary")
@@ -167,6 +207,7 @@ def collect():
                      "alone": risk(d["Date"], ca.values, ma)},
             "eps": {"call": episodes(d["Date"], cw.values),
                     "alone": episodes(d["Date"], ca.values)},
+            "rel": {"call": relative(mw, bpct), "alone": relative(ma, bpct)},
         }
 
     cc = pd.read_excel(os.path.join(PORT, "Conditioned_Call_Updated.xlsx"),

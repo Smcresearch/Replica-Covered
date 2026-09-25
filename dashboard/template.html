@@ -149,6 +149,7 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .sw{width:14px;height:3px;border-radius:2px;flex:none}
 .sw.b{height:10px;border-radius:2px}
 .sw.dash{background:repeating-linear-gradient(90deg,var(--alone) 0 5px,transparent 5px 9px)}
+.sw.dot{background:repeating-linear-gradient(90deg,var(--ink-3) 0 2px,transparent 2px 5px)}
 
 .tip{position:fixed;pointer-events:none;z-index:70;background:var(--rail);
   color:var(--rail-ink);border-radius:7px;padding:9px 11px;box-shadow:0 6px 20px rgba(0,0,0,.28);
@@ -170,6 +171,8 @@ th:first-child,td:first-child{text-align:left}
 tbody tr:last-child td{border-bottom:0}
 tbody tr.hi td{background:var(--sunk);font-weight:600}
 tbody tr.sep td{border-top:1px solid var(--line)}
+tbody tr.bench td{color:var(--ink-2);background:var(--sunk)}
+tbody tr.bench td:first-child{font-weight:600}
 td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
 td .tag{font:600 9.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
   padding:3px 6px;border-radius:4px;background:var(--sunk);color:var(--ink-3)}
@@ -275,7 +278,7 @@ const panel = (cls,title,sub,right,body,note) => `
     <div class="pb${cls.includes("flush")?" flush":""}">${body}${note?`<p class="note">${note}</p>`:""}</div>
   </section>`;
 const legend = items => `<ul class="lg">${items.map(i=>
-  `<li><span class="sw ${i.bar?"b":""} ${i.dash?"dash":""}" style="${i.dash?"":"background:"+i.c}"></span>${i.t}</li>`).join("")}</ul>`;
+  `<li><span class="sw ${i.bar?"b":""} ${i.st||""}" style="${i.st?"":"background:"+i.c}"></span>${i.t}</li>`).join("")}</ul>`;
 const nice = x => { const p=Math.pow(10,Math.floor(Math.log10(Math.abs(x)||1))),n=x/p;
   return (n<=1?1:n<=2?2:n<=5?5:10)*p; };
 
@@ -306,7 +309,7 @@ function line(node,series,o){
     }
     let d=""; pts.forEach(([i,v],j)=>d+=(j?"L":"M")+X(i)+","+Y(v));
     s+=`<path d="${d}" fill="none" stroke="${se.c}" stroke-width="2" stroke-linejoin="round"
-         stroke-linecap="round"${se.dash?' stroke-dasharray="5 4"':''}/>`;
+         stroke-linecap="round"${se.da?` stroke-dasharray="${se.da}"`:''}/>`;
     const [li,lv]=pts[pts.length-1];
     s+=`<circle cx="${X(li)}" cy="${Y(lv)}" r="3.5" fill="${se.c}" stroke="var(--panel)" stroke-width="2"/>`;
     if(o.r!==0) s+=`<text class="dl" x="${X(li)+8}" y="${Y(lv)+3.5}" fill="${se.c}">${lv.toFixed(1)}${o.unit||"%"}</text>`;
@@ -423,11 +426,41 @@ function statBand(){
 
 const LABELS = c => c.map((x,i)=> x.d.slice(5)==="01"||i===0 ? x.d.slice(0,4) : "");
 
+/* Overview's benchmark block: relative stats either for the selected book
+   (alone vs with the call) or for both books when comparing. */
+function benchPanel(){
+  const rows = book==="C"
+    ? [["Model A + call",D.books.A.rel.call],["Model D + call",D.books.D.rel.call]]
+    : [[B().label+" alone",B().rel.alone],[B().label+" + call",B().rel.call]];
+  const bs=D.bench.summary;
+  const cells = rows.map(([n,r])=>`<tr${n.includes("+ call")?' class="hi"':''}>
+      <td>${n}</td><td class="n">${r.corr.toFixed(3)}</td><td class="n">${r.beta.toFixed(2)}</td>
+      <td class="n up">+${r.alpha.toFixed(2)}%</td><td class="n">${r.up}%</td>
+      <td class="n">${r.down}%</td><td class="n">${r.beat}%</td></tr>`).join("");
+  return `<div class="tw"><table style="min-width:600px"><thead><tr><th>Book</th>
+      <th>Correlation</th><th>Beta</th><th>Alpha /yr</th><th>Up capture</th>
+      <th>Down capture</th><th>Months beating index</th></tr></thead>
+      <tbody>${cells}</tbody></table></div>
+    <div class="kv" style="margin-top:16px">
+      <div><span>NIFTY 50, mandate basis</span><span>${bs["Return_pa_%"].toFixed(2)}% /yr</span></div>
+      <div><span>NIFTY 50, buy-and-hold CAGR</span><span>${bs["CAGR_%"].toFixed(2)}%</span></div>
+      <div><span>NIFTY 50 max drawdown</span><span>${bs["Max_DD_%"].toFixed(2)}%</span></div>
+    </div>`;
+}
+
 function viewOverview(){
   const b=B();
-  const cmp=[["A","alone"],["A","withcall"],["D","alone"],["D","withcall"]].map(([k,w])=>{
+  const bs=D.bench.summary, br=D.bench.risk;
+  const benchRow=`<tr class="bench"><td>NIFTY 50 (buy &amp; hold)</td>
+      <td class="n">${bs["Return_pa_%"].toFixed(2)}%</td><td class="n">${bs["Max_DD_%"].toFixed(2)}%</td>
+      <td class="n">${bs["Vol_%"].toFixed(2)}%</td><td class="n">${bs.Sharpe.toFixed(2)}</td>
+      <td class="n">${br.sortino.toFixed(2)}</td><td class="n">${bs.CAR_MDD.toFixed(2)}</td>
+      <td class="n">${bs["Worst_Month_%"].toFixed(2)}%</td>
+      <td class="n">${bs["Win_Months_%"].toFixed(1)}%</td>
+      <td class="n">${rs(bs.Total_Profit_Rs)}</td></tr>`;
+  const cmp=benchRow+[["A","alone"],["A","withcall"],["D","alone"],["D","withcall"]].map(([k,w])=>{
     const s=D.books[k][w],r=D.books[k].risk[w==="alone"?"alone":"call"];
-    return `<tr${w==="withcall"?' class="hi"':''}><td>${s.Book}</td>
+    return `<tr class="${w==="withcall"?"hi":""}${k==="A"&&w==="alone"?" sep":""}"><td>${s.Book}</td>
       <td class="n">${s["Return_pa_%"].toFixed(2)}%</td><td class="n">${s["Max_DD_%"].toFixed(2)}%</td>
       <td class="n">${s["Vol_%"].toFixed(2)}%</td><td class="n">${s.Sharpe.toFixed(2)}</td>
       <td class="n">${r.sortino.toFixed(2)}</td><td class="n">${s.CAR_MDD.toFixed(2)}</td>
@@ -464,7 +497,13 @@ function viewOverview(){
     + panel("c4","What the overlay changed","","",at)
     + panel("c12","Underwater","Distance below the previous peak","% of ₹1 Cr",`<div id="uw"></div>`,
         "Every drawdown recovers; the longest recovery is 305 days.")
-    + panel("c12 flush","All four books","Same ₹1 crore mandate, same window","",
+    + panel("c12","Against NIFTY 50",
+        "Monthly returns regressed on the index over the same 68 months","benchmark",
+        benchPanel(),
+        "Capture is how much of the index's average move the book kept, by direction. "
+        + "Above 100% on the up side and well below it on the down side is the asymmetry "
+        + "the overlay exists to produce.")
+    + panel("c12 flush","All four books and the benchmark","Same ₹1 crore mandate, same window","",
         `<div class="tw"><table><thead><tr><th>Book</th><th>Return /yr</th><th>Max DD</th>
          <th>Vol</th><th>Sharpe</th><th>Sortino</th><th>CAR/MDD</th><th>Worst mo.</th>
          <th>Win mo.</th><th>Profit</th></tr></thead><tbody>${cmp}</tbody></table></div>`);
@@ -481,7 +520,8 @@ function viewPerf(){
         +`<div id="yr"></div>`,
         "The overlay runs counter-cyclical — largest in the book's weakest years.")
     + panel("c5","Monthly return distribution","Count of months in each band","",
-        legend([{t:b.label+" + call",c:hue(K()),bar:1},{t:"Book alone",c:"var(--alone)",bar:1}])
+        legend([{t:b.label+" + call",c:hue(K()),bar:1},{t:"Book alone",c:"var(--alone)",bar:1},
+                {t:"NIFTY 50",c:"var(--ink-4)",bar:1}])
         +`<div id="hist"></div>`,
         "The overlay pulls months out of the tails and into the middle.")
     + panel("c12","Monthly return on ₹1 crore","Equity plus overlay, each month","",
@@ -489,7 +529,8 @@ function viewPerf(){
          <div class="scale"><span>loss</span><span class="ramp"></span><span>profit</span>
          <span style="margin-left:6px">every cell prints its own value</span></div>`)
     + panel("c12","Rolling 12-month return","Trailing one-year total, re-struck each month","% of ₹1 Cr",
-        legend([{t:b.label+" + call",c:hue(K())},{t:"Book alone",dash:1}])
+        legend([{t:b.label+" + call",c:hue(K())},{t:"Book alone",st:"dash"},
+                {t:"NIFTY 50",st:"dot"}])
         +`<div id="roll"></div>`,
         "The first eleven months have no trailing year behind them, so the line starts in 2022.")
     + panel("c12 flush","Yearly ledger","","",
@@ -517,7 +558,8 @@ function viewRisk(){
       `<div class="s"><div class="k">${t[0]}</div><div class="v">${t[1]}</div>
        <div class="d">${t[2]}</div></div>`).join("")}</div>`
     + panel("c12","Drawdown, with and against the overlay","Same book, same window","% of ₹1 Cr",
-        legend([{t:b.label+" + call",c:hue(K())},{t:"Book alone",dash:1}])
+        legend([{t:b.label+" + call",c:hue(K())},{t:"Book alone",st:"dash"},
+                {t:"NIFTY 50",st:"dot"}])
         +`<div id="ddc"></div>`,
         "The overlay rarely changes when you are underwater — it changes how deep.")
     + panel("c6 flush","Deepest drawdowns — with the call","","",
@@ -587,19 +629,21 @@ function viewTrades(){
 function draw(){
   const b=B(), lab=LABELS(b.curve), tipD=i=>b.curve[i].d;
   if(view==="ov"){
+    const NB = {n:"NIFTY 50",v:D.bench.curve,c:"var(--ink-3)",da:"2 3",st:"dot"};
     const se = book==="C"
-      ? [{n:"Model A + call",v:D.books.A.curve.map(c=>c.p),c:"var(--a)"},
-         {n:"Model D + call",v:D.books.D.curve.map(c=>c.p),c:"var(--d)"}]
-      : [{n:b.label+" alone",v:b.curve.map(c=>c.a),c:"var(--alone)",dash:1},
-         {n:b.label+" + call",v:b.curve.map(c=>c.p),c:hue(K()),fill:1}];
+      ? [NB,{n:"Model A + call",v:D.books.A.curve.map(c=>c.p),c:"var(--a)"},
+            {n:"Model D + call",v:D.books.D.curve.map(c=>c.p),c:"var(--d)"}]
+      : [NB,{n:b.label+" alone",v:b.curve.map(c=>c.a),c:"var(--alone)",da:"5 4",st:"dash"},
+            {n:b.label+" + call",v:b.curve.map(c=>c.p),c:hue(K()),fill:1}];
     $("#lgCurve").innerHTML = se.map(s=>
-      `<li><span class="sw ${s.dash?"dash":""}" style="${s.dash?"":"background:"+s.c}"></span>${s.n}</li>`).join("");
+      `<li><span class="sw ${s.st||""}" style="${s.st?"":"background:"+s.c}"></span>${s.n}</li>`).join("");
     line($("#curve"),se,{labels:lab,aria:"Cumulative profit",tip:tipD,h:266});
+    const NUW = {n:"NIFTY 50",v:D.bench.dd,c:"var(--ink-3)",da:"2 3"};
     const uw = book==="C"
-      ? [{n:"Model A + call",v:D.books.A.curve.map(c=>c.dd),c:"var(--a)",fill:1},
-         {n:"Model D + call",v:D.books.D.curve.map(c=>c.dd),c:"var(--d)",fill:1}]
-      : [{n:b.label+" alone",v:b.curve.map(c=>c.dda),c:"var(--alone)",dash:1},
-         {n:b.label+" + call",v:b.curve.map(c=>c.dd),c:hue(K()),fill:1}];
+      ? [NUW,{n:"Model A + call",v:D.books.A.curve.map(c=>c.dd),c:"var(--a)",fill:1},
+             {n:"Model D + call",v:D.books.D.curve.map(c=>c.dd),c:"var(--d)",fill:1}]
+      : [NUW,{n:b.label+" alone",v:b.curve.map(c=>c.dda),c:"var(--alone)",da:"5 4"},
+             {n:b.label+" + call",v:b.curve.map(c=>c.dd),c:hue(K()),fill:1}];
     line($("#uw"),uw,{labels:lab,aria:"Drawdown",tip:tipD,h:190});
   }
   if(view==="pf"){
@@ -610,19 +654,22 @@ function draw(){
         const y=b.yearly.find(x=>x.y===r.k); return [pc(y.pct),y.pct>=0?"var(--good)":"var(--crit)"];},
        fmtAx:t=>(t/1e5).toFixed(0)+"L"});
     const H=D.meta.hist;
-    bars($("#hist"),H.map((h,i)=>({k:h,v:[b.hist.call[i],b.hist.alone[i]],t:h,
-        rows:[["With call",b.hist.call[i]+" months"],["Alone",b.hist.alone[i]+" months"]]})),
-      {colors:[hue(K()),"var(--alone)"],aria:"Monthly distribution",h:262,l:34,b:46,
-       fmtAx:t=>t.toFixed(0)});
+    bars($("#hist"),H.map((h,i)=>({k:h,v:[b.hist.call[i],b.hist.alone[i],D.bench.hist[i]],t:h,
+        rows:[["With call",b.hist.call[i]+" months"],["Alone",b.hist.alone[i]+" months"],
+              ["NIFTY 50",D.bench.hist[i]+" months"]]})),
+      {colors:[hue(K()),"var(--alone)","var(--ink-4)"],aria:"Monthly distribution",
+       h:262,l:34,b:46,fmtAx:t=>t.toFixed(0)});
     heat(b);
     line($("#roll"),[
-      {n:b.label+" alone",v:b.roll.alone,c:"var(--alone)",dash:1},
+      {n:"NIFTY 50",v:D.bench.roll,c:"var(--ink-3)",da:"2 3"},
+      {n:b.label+" alone",v:b.roll.alone,c:"var(--alone)",da:"5 4"},
       {n:b.label+" + call",v:b.roll.call,c:hue(K()),fill:1}],
       {labels:lab,aria:"Rolling 12-month return",tip:tipD,h:210});
   }
   if(view==="rk"){
     line($("#ddc"),[
-      {n:b.label+" alone",v:b.curve.map(c=>c.dda),c:"var(--alone)",dash:1},
+      {n:"NIFTY 50",v:D.bench.dd,c:"var(--ink-3)",da:"2 3"},
+      {n:b.label+" alone",v:b.curve.map(c=>c.dda),c:"var(--alone)",da:"5 4"},
       {n:b.label+" + call",v:b.curve.map(c=>c.dd),c:hue(K()),fill:1}],
       {labels:lab,aria:"Drawdown comparison",tip:tipD,h:250});
   }
