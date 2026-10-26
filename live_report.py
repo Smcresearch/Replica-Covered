@@ -1,4 +1,4 @@
-"""September 2026 live report: holdings marked to market, condor log, MTD.
+"""Live monthly report: holdings marked to market, option logs, month-to-date.
 
 One workbook answering three questions:
   what do I hold and what is it worth now   -> Model_A / Model_D holdings, each
@@ -9,14 +9,12 @@ One workbook answering three questions:
 Buy price is the 2026-09-01 rebalance price (chosen off data through 31 Aug);
 current price is the last close on disk.
 
-    python september_report.py
+    python live_report.py
 """
 import pandas as pd
 
 CAPITAL = 1e7
 MONTH_START = "2026-09-01"
-OUT_REPLICA = r"D:\DK_sir\Replica_September_2026.xlsx"
-OUT_CALL = r"D:\DK_sir\Covered_Call_September_2026.xlsx"
 NIFTY_DIR = r"D:\DK_sir\nifty50"
 
 BOOKS = {
@@ -34,6 +32,17 @@ def last_close(sym):
     d["Date"] = pd.to_datetime(d["Date"], format="%d-%m-%Y", errors="coerce")
     d = d.dropna().sort_values("Date")
     return float(d["Close"].iloc[-1]), d["Date"].iloc[-1]
+
+
+def rebalance_month():
+    """First day of the month the live book was struck, from the workbooks."""
+    seen = set()
+    for path in BOOKS.values():
+        d = pd.read_excel(path, sheet_name="Current_Portfolio_Quantities")
+        seen.add(str(d["Rebalance_Date"].iloc[0])[:10])
+    if len(seen) > 1:
+        raise SystemExit(f"books disagree on the rebalance date: {sorted(seen)}")
+    return seen.pop()
 
 
 def holdings(path):
@@ -63,7 +72,7 @@ def holdings(path):
                              "Sector_Industry": "Sector"}))
 
 
-def mtd():
+def mtd(MONTH_START):
     """Month-to-date return of each book against NIFTY, from the daily series."""
     rows, series = [], {}
     for name, path in BOOKS.items():
@@ -72,9 +81,10 @@ def mtd():
         m = d[d["Date"] >= MONTH_START].copy()
         p = (1 + m["Portfolio_Daily_Return_%"] / 100).prod() - 1
         n = (1 + m["NIFTY50_Daily_Return_%"] / 100).prod() - 1
-        # The rebalance day's own return belongs to the transition, not to the
-        # new book. The holdings sheets mark from the 2026-09-01 close, so this
-        # second figure is the one that reconciles with them.
+        # The engine credits the new book with the rebalance day's own move, so
+        # it assumes execution at the prior close. The holdings sheets mark from
+        # the rebalance-day close instead, and this second figure is the one
+        # that reconciles with them.
         after = m[m["Date"] > MONTH_START]
         p2 = (1 + after["Portfolio_Daily_Return_%"] / 100).prod() - 1
         rows.append(dict(Book=name, Sessions=len(m),
@@ -111,11 +121,18 @@ def condor_log():
 
 
 def main():
+    MONTH_START = rebalance_month()
+    stamp = pd.Timestamp(MONTH_START).strftime("%B_%Y")
+    label = pd.Timestamp(MONTH_START).strftime("%B %Y")
+    OUT_REPLICA = rf"D:\DK_sir\Replica_{stamp}.xlsx"
+    OUT_CALL = rf"D:\DK_sir\Covered_Call_{stamp}.xlsx"
+
     hold = {n: holdings(p) for n, p in BOOKS.items()}
-    perf, series = mtd()
+    perf, series = mtd(MONTH_START)
     condors = condor_log()
     cc = pd.read_excel(CONDITIONED, sheet_name="full_sample")
-    cc_sep = cc[cc["Entry"] >= MONTH_START]
+    cc_mon = cc[cc["Entry"] >= MONTH_START]
+    print(f"month: {label}  (rebalanced {MONTH_START})")
 
     print("=" * 96)
     print("MONTH TO DATE")
@@ -131,18 +148,18 @@ def main():
               f"worst {d.iloc[-1].Symbol} {d.iloc[-1].PnL_Pct:+.2f}%   "
               f"{int((d.PnL_INR > 0).sum())}/{len(d)} in profit")
 
-    sep1 = condors["Condor_1.4-2.2s"]
-    sep1 = sep1[sep1.Entry_Date >= pd.Timestamp(MONTH_START).date()]
-    print(f"\nCondor 1.4/2.2s September cycles: {len(sep1)}, "
-          f"net Rs {sep1.Net_PnL.sum():,.0f}")
-    print(f"Conditioned call September cycles: {len(cc_sep)}, "
-          f"net Rs {cc_sep.Net_Rs.sum():,.0f}")
+    cyc1 = condors["Condor_1.4-2.2s"]
+    cyc1 = cyc1[cyc1.Entry_Date >= pd.Timestamp(MONTH_START).date()]
+    print(f"\nCondor 1.4/2.2s cycles this month: {len(cyc1)}, "
+          f"net Rs {cyc1.Net_PnL.sum():,.0f}")
+    print(f"Conditioned call cycles this month: {len(cc_mon)}, "
+          f"net Rs {cc_mon.Net_Rs.sum():,.0f}")
 
     notes = pd.DataFrame([
-        ("Buy_Price", "close on the 2026-09-01 rebalance, chosen off data "
-                      "through 31-Aug-2026"),
+        ("Buy_Price", f"close on the {MONTH_START} rebalance, chosen off data "
+                      f"through the prior month end"),
         ("Current_Price", "last close on disk (see As_Of column)"),
-        ("MTD_Pct", "compounded daily return from 2026-09-01 inclusive"),
+        ("MTD_Pct", f"compounded daily return from {MONTH_START} inclusive"),
         ("Since_Rebal_Pct", "same but excluding the rebalance day's own "
                             "return - this is what reconciles with the "
                             "holdings sheets"),
@@ -174,7 +191,7 @@ def main():
         cc_sum = pd.read_excel(CONDITIONED, sheet_name="Summary")
         cc_sum.to_excel(xl, sheet_name="Summary", index=False)
         cc.to_excel(xl, sheet_name="Conditioned_Call_Log", index=False)
-        cc_sep.to_excel(xl, sheet_name="September_Cycles", index=False)
+        cc_mon.to_excel(xl, sheet_name="Cycles_This_Month", index=False)
         for label, d in condors.items():
             d.to_excel(xl, sheet_name=label[:31], index=False)
         notes[notes.Field.isin(["Condor log", "Conditioned_Call_Log"])].to_excel(
