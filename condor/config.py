@@ -44,7 +44,7 @@ class CondorConfig:
 
     # ---- universe / cache -------------------------------------------
     start_date: str = "2019-02-01"  # Jan-2019 files have corrupt strike data
-    end_date: str = "2026-10-16"
+    end_date: str = "2026-11-16"
     #: Expiries are cached this many trading days back from expiry day.
     #: Must be >= entry_dte, otherwise the entry bar will not be in cache.
     cache_lookback_days: int = 12
